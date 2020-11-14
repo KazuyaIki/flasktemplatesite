@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}wordcloud-{{ super() }}{% endblock %}
+{% block content %}
+<h1 class="display-4 m-5 text-center font-weight-bold text-info">WordCloud</h1>
+<h3 class="text-center text-warning">This app doesn't work with Japanese language.<br>Text must be alphabetical.</h3>
+<form method="POST" class='form mx-auto w-75'>
+    {{ form.csrf_token }}
+    <div class="form-group mx-sm-3 mb-2">
+        <label>{{ form.text.label }}</label>
+        {% if form.text.errors %}
+            {{ form.text(class="form-control form-control-lg border-danger") }}
+            <div>
+                {% for error in form.text.errors %}
+                    <span class='text-danger'>{{ error }}</span>
+                    <br>
+                {% endfor%}
+            </div>
+        {% else %}
+            {{ form.text(class="form-control form-control-lg  border-success") }}
+        {% endif %}
+    </div>
+    {{ form.submit(class="btn btn-lg btn-info btn-block mt-4 mb-5") }}
+</form>
+<br>
+{% if path %}
+<div class='text-center'>
+    <img src="{{ url_for('static', filename=path) }}">
+</div>
+{% endif %}
+{% endblock content %}

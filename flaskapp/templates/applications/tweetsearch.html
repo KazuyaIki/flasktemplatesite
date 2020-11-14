@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+{% block title %}Tweepy-{{ super() }}{% endblock %}
+{% block content %}
+<h1 class="display-4 m-5 text-center font-weight-bold text-info">Tweepy</h1>
+<h3 class="text-center text-warning">You can extract tweets from Twitter.<br>Note that they are limited within last 7 days.</h3>
+<form method="POST" class='form mx-auto w-75'>
+    {{ form.csrf_token }}
+    <div class="form-group mx-sm-5 mb-2">
+        <label>{{ form.keyword_1.label }}</label>
+        {% if form.keyword_1.errors %}
+            {{ form.keyword_1(class="form-control form-control-lg border-danger") }}
+            <div>
+                {% for error in form.keyword_1.errors %}
+                    <span class='text-danger'>{{ error }}</span>
+                    <br>
+                {% endfor%}
+            </div>
+        {% else %}
+            {{ form.keyword_1(class="form-control form-control-lg  border-success") }}
+        {% endif %}
+    </div>
+    <div class="form-group mx-sm-5 mb-2">
+        <label>{{ form.keyword_2.label }}</label>
+        {% if form.keyword_2.errors %}
+            {{ form.keyword_2(class="form-control form-control-lg border-danger") }}
+            <div>
+                {% for error in form.keyword_2.errors %}
+                    <span class='text-danger'>{{ error }}</span>
+                    <br>
+                {% endfor%}
+            </div>
+        {% else %}
+            {{ form.keyword_2(class="form-control form-control-lg  border-success") }}
+        {% endif %}
+    </div>
+    <div class="form-group mx-sm-5 mb-2">
+        <label>{{ form.keyword_3.label }}</label>
+        {% if form.keyword_3.errors %}
+            {{ form.keyword_3(class="form-control form-control-lg border-danger") }}
+            <div>
+                {% for error in form.keyword_3.errors %}
+                    <span class='text-danger'>{{ error }}</span>
+                    <br>
+                {% endfor%}
+            </div>
+        {% else %}
+            {{ form.keyword_3(class="form-control form-control-lg  border-success") }}
+        {% endif %}
+    </div>
+    <div class="form-group mx-sm-5 mb-2">
+        <label>{{ form.keyword_4.label }}</label>
+        {% if form.keyword_4.errors %}
+            {{ form.keyword_4(class="form-control form-control-lg border-danger") }}
+            <div>
+                {% for error in form.keyword_4.errors %}
+                    <span class='text-danger'>{{ error }}</span>
+                    <br>
+                {% endfor%}
+            </div>
+        {% else %}
+            {{ form.keyword_4(class="form-control form-control-lg  border-success") }}
+        {% endif %}
+    </div>
+    <div class="form-group mx-sm-5 mb-2">
+        <label>{{ form.keyword_5.label }}</label>
+        {% if form.keyword_5.errors %}
+            {{ form.keyword_5(class="form-control form-control-lg border-danger") }}
+            <div>
+                {% for error in form.keyword_5.errors %}
+                    <span class='text-danger'>{{ error }}</span>
+                    <br>
+                {% endfor%}
+            </div>
+        {% else %}
+            {{ form.keyword_5(class="form-control form-control-lg  border-success") }}
+        {% endif %}
+    </div>
+    <div class="form-group mx-sm-5 mb-2">
+        <label>{{ form.count.label }}</label>
+        {% if form.count.errors %}
+            {{ form.count(class="form-control form-control-lg border-danger") }}
+            <div>
+                {% for error in form.count.errors %}
+                    <span class='text-danger'>{{ error }}</span>
+                    <br>
+                {% endfor%}
+            </div>
+        {% else %}
+            {{ form.count(class="form-control form-control-lg  border-success") }}
+        {% endif %}
+    </div>
+
+    {{ form.submit(class="btn btn-lg btn-info btn-block mt-4 mb-5") }}
+</form>
+
+    <table class="table text-center">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">created_at</th>
+            <th scope="col">screen_name</th>
+            <th scope="col">name</th>
+            <th scope="col">tweet</th>
+            <th scope="col">favorite</th>
+            <th scope="col">retweet</th>
+            <th scope="col">send favorite</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for tweet in tweet_list %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ tweet['created_at'] }}</td>
+            <td>{{ tweet['screen_name'] }}</td>
+            <td>{{ tweet['name'] }}</td>
+            <td>{{ tweet['full_text'] }}</td>
+            <td>{{ tweet['favorite_count'] }}</td>
+            <td>{{ tweet['retweet_count'] }}</td>
+            <td>
+                <button class="btn btn-md btn-danger btn-block mt-4 mb-5">favorite!</button>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+{% endblock content %}

@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block title %}Tweepy-{{ super() }}{% endblock %}
+{% block content %}
+<h1 class="display-4 m-5 text-center font-weight-bold text-info">My Cart</h1>
+<h3 class="text-center text-warning">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta eveniet quod, quasi impedit nisi repellendus est aliquid quo quibusdam distinctio consequatur, neque, pariatur voluptate nulla minima quia quae soluta expedita.</h3>
+
+    <table class="table text-center mt-5">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">image</th>
+            <th scope="col">name</th>
+            <th scope="col">amount</th>
+            <th scope="col">price</th>
+            <th scope="col">date added</th>
+            <th scope="col">delete</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td style="min-width: 80px; max-width: 80px">
+                {% if item.image_path %}
+                <img
+                    src="{{ url_for('static', filename=item.image_path) }}"
+                    class="card-img-top"
+                />
+                {% else %}
+                <img
+                    src="{{ url_for('static', filename='images/product/alt_image.jpg') }}"
+                    class="card-img-top"
+                />
+                {% endif %}
+            </td>
+            <td>{{ item['product_name'] }}</td>
+            <td>1</td>
+            <td>{{ item['price'] }}</td>
+            <td>{{ item['added_at'] }}</td>
+            <td>
+                <form method='GET'>
+                    <input type="hidden" value="{{ item['cart_id'] }}" name="deletecart_id" />
+                    <button type='submit' class="btn btn-md btn-danger btn-block mt-4 mb-5">delete</button>
+                </form>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+{% endblock content %}

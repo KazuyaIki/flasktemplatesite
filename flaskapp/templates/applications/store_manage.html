@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+{% block title %}store_manage-{{ super() }}
+{% endblock %}
+
+{% block content %}
+<h1 class="display-4 m-5 text-center font-weight-bold text-info">
+  Store manager
+</h1>
+<h3 class="text-center text-warning mb-4">
+  Lorem ipsum, dolor sit amet consectetur adipisicing elit. Doloremque, neque. Pariatur aliquam praesentium eveniet. Voluptas corporis doloribus reiciendis est neque aspernatur dignissimos tempora blanditiis deleniti recusandae, temporibus aut totam nihil.
+</h3>
+<div class="jumbotron">
+  <h1 class="text-center">Add New Product</h1>
+  <hr class="my-4" />
+  <form method="POST">
+    {{ form.csrf_token }}
+    <div class="row">
+      <div class="form-group col-12 col-sm-4">
+        <label for="formGroupExampleInput">{{ form.product_name.label }}</label>
+        {% if form.product_name.errors %} {{ form.product_name(class="form-control form-control-md border-danger") }}
+        <div>
+          {% for error in form.product_name.errors %}
+          <span class="text-danger">{{ error }}</span>
+          <br />
+          {% endfor%}
+        </div>
+        {% else %} {{ form.product_name(class="form-control form-control-md border-success") }} {% endif %}
+      </div>
+      <div class="form-group col-6 col-sm-4">
+        <label for="formGroupExampleInput">{{ form.price.label }}</label>
+        {% if form.price.errors %} {{ form.price(class="form-control form-control-md border-danger") }}
+        <div>
+          {% for error in form.price.errors %}
+          <span class="text-danger">{{ error }}</span>
+          <br />
+          {% endfor%}
+        </div>
+        {% else %} {{ form.price(class="form-control form-control-md border-success") }} {% endif %}
+      </div>
+      <div class="form-group col-6 col-sm-4">
+        <label for="formGroupExampleInput">{{ form.stock.label }}</label>
+        {% if form.stock.errors %} {{ form.stock(class="form-control form-control-md border-danger") }}
+        <div>
+          {% for error in form.stock.errors %}
+          <span class="text-danger">{{ error }}</span>
+          <br />
+          {% endfor%}
+        </div>
+        {% else %} {{ form.stock(class="form-control form-control-md
+        border-success") }} {% endif %}
+      </div>
+      <div class="form-group col-12 col-sm-8">
+        <label for="formGroupExampleInput">{{ form.comment.label }}</label>
+        {% if form.comment.errors %} {{ form.comment(class="form-control
+        form-control-md border-danger") }}
+        <div>
+          {% for error in form.comment.errors %}
+          <span class="text-danger">{{ error }}</span>
+          <br />
+          {% endfor%}
+        </div>
+        {% else %} {{ form.comment(class="form-control form-control-md
+        border-success") }} {% endif %}
+      </div>
+      <div class="form-group col-12 col-sm-4">
+        <label for="formGroupExampleInput">{{ form.image_path.label }}</label>
+        {% if form.image_path.errors %} {{ form.image_path(class="form-control
+        form-control-md border-danger") }}
+        <div>
+          {% for error in form.image_path.errors %}
+          <span class="text-danger">{{ error }}</span>
+          <br />
+          {% endfor%}
+        </div>
+        {% else %} {{ form.image_path(class="form-control form-control-md
+        border-success") }} {% endif %}
+      </div>
+    </div>
+    {{ form.submit(class="btn btn-lg btn-info btn-block mt-4") }}
+  </form>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Price</th>
+      <th scope="col">Comment</th>
+      <th scope="col">Stock</th>
+      <th scope="col">Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for product in products %}
+    <tr>
+      <th scope="row">{{ product.id }}</th>
+      <td>{{ product.product_name }}</td>
+      <td>{{ product.price }}</td>
+      <td>{{ product.comment }}</td>
+      <td>{{ product.stock }}</td>
+      <td>
+        <a
+          class="product{{ loop.index }}"
+          href="{{ url_for('applications.product_edit', product_name=product.product_name)}}"
+        >
+          <button class="btn btn-md btn-danger" type="button">edit</button>
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock content %}

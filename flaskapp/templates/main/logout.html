@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}
+login-{{ super() }}
+{% endblock %}
+
+{% block content %}
+<h1 class="display-4 m-5 text-center font-weight-bold text-info">Logout Page</h1>
+<div class="card text-center">
+    <h3 class="card-header">Are you sure to logout now?</h3>
+    <h3 class="card-title mt-4">Click the button bellow to logout</h3>
+    <br>
+    <form method="POST" class='form mx-auto w-75'>
+        {{ form.csrf_token }}
+        {{ form.submit(class="btn btn-primary btn-lg btn-block mb-4") }}
+    </form>
+</div>
+{% endblock content %}

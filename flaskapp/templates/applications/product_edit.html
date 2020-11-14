@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+{% block title %}product_edit-{{ super() }}{% endblock %}
+{% block content %}
+<h1 class="display-4 m-5 text-center font-weight-bold text-info">Product Edit</h1>
+<h3 class="text-center text-warning mb-">You can extract secondhand cars info from goo-net database.<br>Note it may take a bit long time.</h3>
+<div class="jumbotron">
+  <h1 class='text-center'>Edit {{ product_name }}</h1>
+    <hr class="my-4">
+<form method='POST'>
+  {{ form.csrf_token }}
+  <div class='row'>
+  <div class="form-group col-12 col-sm-4">
+    <label for="formGroupExampleInput">{{ form.product_name.label }}</label>
+    {% if form.product_name.errors %}
+        {{ form.product_name(class="form-control form-control-md border-danger") }}
+        <div>
+            {% for error in form.product_name.errors %}
+                <span class='text-danger'>{{ error }}</span>
+                <br>
+            {% endfor%}
+        </div>
+    {% else %}
+        {{ form.product_name(class="form-control form-control-md  border-success", value=product.product_name) }}
+    {% endif %}
+  </div>
+  <div class="form-group col-6 col-sm-4">
+    <label for="formGroupExampleInput">{{ form.price.label }}</label>
+    {% if form.price.errors %}
+        {{ form.price(class="form-control form-control-md border-danger") }}
+        <div>
+            {% for error in form.price.errors %}
+                <span class='text-danger'>{{ error }}</span>
+                <br>
+            {% endfor%}
+        </div>
+    {% else %}
+        {{ form.price(class="form-control form-control-md  border-success", value=product.price) }}
+    {% endif %}
+  </div>
+  <div class="form-group col-6 col-sm-4">
+    <label for="formGroupExampleInput">{{ form.stock.label }}</label>
+    {% if form.stock.errors %}
+        {{ form.stock(class="form-control form-control-md border-danger") }}
+        <div>
+            {% for error in form.stock.errors %}
+                <span class='text-danger'>{{ error }}</span>
+                <br>
+            {% endfor%}
+        </div>
+    {% else %}
+        {{ form.stock(class="form-control form-control-md  border-success", value=product.stock) }}
+    {% endif %}
+  </div>
+  <div class="form-group col-12 col-sm-8">
+    <label for="formGroupExampleInput">{{ form.comment.label }}</label>
+    {% if form.comment.errors %}
+        {{ form.comment(class="form-control form-control-md border-danger") }}
+        <div>
+            {% for error in form.comment.errors %}
+                <span class='text-danger'>{{ error }}</span>
+                <br>
+            {% endfor%}
+        </div>
+    {% else %}
+        {{ form.comment(class="form-control form-control-md  border-success", value=product.comment) }}
+    {% endif %}
+  </div>
+  <div class="form-group col-12 col-sm-4">
+    <label for="formGroupExampleInput">{{ form.image_path.label }}</label>
+    {% if form.image_path.errors %}
+        {{ form.image_path(class="form-control form-control-md border-danger") }}
+        <div>
+            {% for error in form.image_path.errors %}
+                <span class='text-danger'>{{ error }}</span>
+                <br>
+            {% endfor%}
+        </div>
+    {% else %}
+        {{ form.image_path(class="form-control form-control-md  border-success", value=product.image_path) }}
+    {% endif %}
+  </div>
+</div>
+  {{ form.submit(class="btn btn-lg btn-info btn-block mt-4 mb-5") }}
+</form>
+<button class="btn btn-lg btn-danger btn-block" type="button" data-toggle="modal" data-target="#delete">
+    Delete Product
+</button>
+<div class="modal fade" id="delete" tabindex="-1" aria-labelledby="deleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteLabel">Delete Product</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure to delete "{{ product_name}}"?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <a href="{{ url_for('applications.productdelete', product_name=product_name)}}">
+              <button type="button" class="btn btn-primary">Yes, delete it</button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

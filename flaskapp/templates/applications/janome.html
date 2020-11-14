@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block title %}janome-{{ super() }}{% endblock %}
+{% block content %}
+<h1 class="display-4 m-5 text-center font-weight-bold text-info">janome</h1>
+<h3 class="text-center text-warning">You can extract words in a particular part of speech.<br> This app is only for Japanese language.</h3>
+<form method="POST" class='form mx-auto w-75'>
+    {{ form.csrf_token }}
+    <div class="form-group mx-sm-3 mb-2">
+        <label>{{ form.text.label }}</label>
+        {% if form.text.errors %}
+            {{ form.text(class="form-control form-control-lg border-danger") }}
+            <div>
+                {% for error in form.text.errors %}
+                    <span class='text-danger'>{{ error }}</span>
+                    <br>
+                {% endfor%}
+            </div>
+        {% else %}
+            {{ form.text(class="form-control form-control-lg  border-success") }}
+        {% endif %}
+    </div>
+    {% if letter_counter %}
+    <h4 class='text-right text-warning'>letter counter : {{ letter_counter }}</h4>
+    {% endif %}
+    <div class="form-group mx-sm-3 mb-2">
+        <label>{{ form.parts_of_speech.label }}</label>
+        <div>
+            {% if form.parts_of_speech.errors %}
+                {% for error in form.parts_of_speech.errors %}
+                    <span class='text-danger'>{{ error }}</span>
+                {% endfor%}
+            {% endif %}
+        </div>
+        <ul class='list-group list-group-horizontal'>
+            {% for part_of_speech in form.parts_of_speech %}
+            <li class="list-group-item">{{ part_of_speech }} {{ part_of_speech.label }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {{ form.submit(class="btn btn-lg btn-info btn-block mt-4 mb-5") }}
+    {% if sum_of_words %}
+    <h4 class='text-right text-warning'>The total of the frequencies : {{ sum_of_words }}</h4>
+    {% endif %}
+    <br>
+    <table class="table text-center">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">{{ pos }}</th>
+            <th scope="col">frequency</th>
+            <th scope="col">#</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for k, v in word_dict %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ k }}</td>
+            <td>{{ v }}</td>
+            <td>#</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+{% endblock content %}

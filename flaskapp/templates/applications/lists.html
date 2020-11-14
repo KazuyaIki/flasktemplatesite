@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block title %}lists-{{ super() }}{% endblock %}
+{% block content %}
+<div class='row mx-auto'>
+    <div class="card w-75 m-4 mx-auto col-md-5">
+        <div class="card-body">
+            <h3 class="card-title">Wordcloud</h3>
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <a href="{{ url_for('applications.wordcloud') }}" class="btn btn-primary">Wordcolud</a>
+        </div>
+    </div>
+    <div class="card w-75 m-4 mx-auto col-md-5">
+         <div class="card-body">
+            <h3 class="card-title">janome : Morphological analysis</h3>
+            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <a href="{{ url_for('applications.janome') }}" class="btn btn-primary">janome</a>
+        </div>
+    </div>
+    <div class="card w-75 m-4 mx-auto col-md-5">
+        <div class="card-body">
+           <h3 class="card-title">Tweepy : Tweets search</h3>
+           <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+           <a href="{{ url_for('applications.tweetsearch') }}" class="btn btn-primary">Tweepy</a>
+       </div>
+   </div>
+   <div class="card w-75 m-4 mx-auto col-md-5">
+        <div class="card-body">
+        <h3 class="card-title">Selenium_BS : secondhand cars search</h3>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="{{ url_for('applications.selenium_bs') }}" class="btn btn-primary">Selenium_BS</a>
+        </div>
+   </div>
+   <div class="card w-75 m-4 mx-auto col-md-5">
+    <div class="card-body">
+        <h3 class="card-title">Store</h3>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="{{ url_for('applications.store') }}" class="btn btn-primary">Store</a>
+    </div>
+   </div>
+   <div class="card w-75 m-4 mx-auto col-md-5">
+        <div class="card-body">
+        <h3 class="card-title">Store manager</h3>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="{{ url_for('applications.storemanage') }}" class="btn btn-primary">Store manager</a>
+        </div>
+   </div>
+</div>
+{% endblock content %}

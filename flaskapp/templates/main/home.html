@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+home-{{ super() }}
+{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron mt-5">
+    <h1 class="display-4">Flask Test Application</h1>
+    {% if current_user.is_authenticated %}
+    <p class="lead">You are an authenticated user.<br>You can access the applications from the tab 'applications' or overview them clicking the button bellow.<br>DB usage is limited to administrators.</p>
+    {% else %}
+    <p class="lead">Only authenticated users can access the applications.<br>If you'd like, please register yourself.</p>
+    {% endif %}
+    <hr class="my-4">
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut sunt modi nobis amet aperiam at soluta pariatur iure ea exercitationem optio perferendis dolorum provident molestiae corporis, officiis vero error. Iste?Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio sit, vero voluptates dignissimos aliquid nulla harum dolore debitis suscipit officiis sapiente non vitae doloremque sed itaque perferendis molestiae deserunt voluptatem?Lorem ipsum dolor sit, amet consectetur adipisicing elit. Consequuntur aut optio porro minus. Sapiente, tempore tenetur modi assumenda autem consectetur error facilis aspernatur neque nostrum itaque in deleniti aliquid nulla?Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas nostrum dolores facilis laborum? Aut id odio perspiciatis praesentium exercitationem? Ducimus quae quos sed repellendus inventore laboriosam unde quasi voluptatum ullam.</p>
+    {% if current_user.is_authenticated %}
+    <a class="btn btn-primary btn-lg" href="{{ url_for('applications.lists') }}" role="button">Applications overview</a>
+    {% else %}
+    <a class="btn btn-primary btn-lg" href="{{ url_for('main.registration') }}" role="button">Register now</a>
+    {% endif %}
+</div>
+{% endblock content %}

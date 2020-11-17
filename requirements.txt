@@ -83,7 +83,6 @@ python-dotenv
 python-editor==1.0.4
 python-firebase==1.2
 pytz==2020.1
-pywin32==227
 pywinpty==0.5.7
 pyzmq==19.0.1
 qtconsole

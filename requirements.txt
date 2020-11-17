@@ -49,8 +49,6 @@ lxml
 Mako
 MarkupSafe
 matplotlib
-mecab==0.996.2
-mecab-python-windows==0.996.3
 mistune
 mysqlclient==2.0.1
 nbconvert

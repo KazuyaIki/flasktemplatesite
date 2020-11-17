@@ -30,10 +30,6 @@ def updatedecimal():
 def home():
     return render_template('main/home.html', x=random_decimal)
 
-@applications.route('/bs4')
-def bs4():
-	return render_template('menu/bs4.html')
-
 @applications.route('/lists')
 def lists():
     return render_template('applications/lists.html')

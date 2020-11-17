@@ -3,94 +3,97 @@
 {% block content %}
 <h1 class="display-4 m-5 text-center font-weight-bold text-info">Tweepy</h1>
 <h3 class="text-center text-warning">You can extract tweets from Twitter.<br>Note that they are limited within last 7 days.</h3>
-<form method="POST" class='form mx-auto w-75'>
+<form method="POST" class='form mx-auto w-85 mt-5'>
     {{ form.csrf_token }}
-    <div class="form-group mx-sm-5 mb-2">
-        <label>{{ form.keyword_1.label }}</label>
-        {% if form.keyword_1.errors %}
-            {{ form.keyword_1(class="form-control form-control-lg border-danger") }}
-            <div>
-                {% for error in form.keyword_1.errors %}
-                    <span class='text-danger'>{{ error }}</span>
-                    <br>
-                {% endfor%}
-            </div>
-        {% else %}
-            {{ form.keyword_1(class="form-control form-control-lg  border-success") }}
-        {% endif %}
+    <div class='row'>
+        <div class="form-group col-12 col-md-4">
+            <label class='mt-3'><h4>{{ form.keyword_1.label }}</h4></label>
+            {% if form.keyword_1.errors %}
+                {{ form.keyword_1(class="form-control form-control-lg border-danger") }}
+                <div>
+                    {% for error in form.keyword_1.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        <br>
+                    {% endfor%}
+                </div>
+            {% else %}
+                {{ form.keyword_1(class="form-control form-control-lg  border-success") }}
+            {% endif %}
+        </div>
+        <div class="form-group col-12 col-md-4">
+            <label class='mt-3'><h4>{{ form.keyword_2.label }}</h4></label>
+            {% if form.keyword_2.errors %}
+                {{ form.keyword_2(class="form-control form-control-lg border-danger") }}
+                <div>
+                    {% for error in form.keyword_2.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        <br>
+                    {% endfor%}
+                </div>
+            {% else %}
+                {{ form.keyword_2(class="form-control form-control-lg  border-success") }}
+            {% endif %}
+        </div>
+        <div class="form-group col-12 col-md-4">
+            <label class='mt-3'><h4>{{ form.keyword_3.label }}</h4></label>
+            {% if form.keyword_3.errors %}
+                {{ form.keyword_3(class="form-control form-control-lg border-danger") }}
+                <div>
+                    {% for error in form.keyword_3.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        <br>
+                    {% endfor%}
+                </div>
+            {% else %}
+                {{ form.keyword_3(class="form-control form-control-lg  border-success") }}
+            {% endif %}
+        </div>
+        <div class="form-group col-12 col-md-4">
+            <label class='mt-3'><h4>{{ form.keyword_4.label }}</h4></label>
+            {% if form.keyword_4.errors %}
+                {{ form.keyword_4(class="form-control form-control-lg border-danger") }}
+                <div>
+                    {% for error in form.keyword_4.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        <br>
+                    {% endfor%}
+                </div>
+            {% else %}
+                {{ form.keyword_4(class="form-control form-control-lg  border-success") }}
+            {% endif %}
+        </div>
+        <div class="form-group col-12 col-md-4">
+            <label class='mt-3'><h4>{{ form.keyword_5.label }}</h4></label>
+            {% if form.keyword_5.errors %}
+                {{ form.keyword_5(class="form-control form-control-lg border-danger") }}
+                <div>
+                    {% for error in form.keyword_5.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        <br>
+                    {% endfor%}
+                </div>
+            {% else %}
+                {{ form.keyword_5(class="form-control form-control-lg  border-success") }}
+            {% endif %}
+        </div>
+        <div class="form-group col-1"></div>
+        <div class="form-group col-12 col-md-3 ">
+            <label class='mt-3'><h4>{{ form.count.label }}</h4></label>
+            {% if form.count.errors %}
+                {{ form.count(class="form-control form-control-lg border-danger") }}
+                <div>
+                    {% for error in form.count.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        <br>
+                    {% endfor%}
+                </div>
+            {% else %}
+                {{ form.count(class="form-control form-control-lg  border-info") }}
+            {% endif %}
+        </div>
+    
+        {{ form.submit(class="btn btn-lg btn-info btn-block mt-4 mb-5") }}
     </div>
-    <div class="form-group mx-sm-5 mb-2">
-        <label>{{ form.keyword_2.label }}</label>
-        {% if form.keyword_2.errors %}
-            {{ form.keyword_2(class="form-control form-control-lg border-danger") }}
-            <div>
-                {% for error in form.keyword_2.errors %}
-                    <span class='text-danger'>{{ error }}</span>
-                    <br>
-                {% endfor%}
-            </div>
-        {% else %}
-            {{ form.keyword_2(class="form-control form-control-lg  border-success") }}
-        {% endif %}
-    </div>
-    <div class="form-group mx-sm-5 mb-2">
-        <label>{{ form.keyword_3.label }}</label>
-        {% if form.keyword_3.errors %}
-            {{ form.keyword_3(class="form-control form-control-lg border-danger") }}
-            <div>
-                {% for error in form.keyword_3.errors %}
-                    <span class='text-danger'>{{ error }}</span>
-                    <br>
-                {% endfor%}
-            </div>
-        {% else %}
-            {{ form.keyword_3(class="form-control form-control-lg  border-success") }}
-        {% endif %}
-    </div>
-    <div class="form-group mx-sm-5 mb-2">
-        <label>{{ form.keyword_4.label }}</label>
-        {% if form.keyword_4.errors %}
-            {{ form.keyword_4(class="form-control form-control-lg border-danger") }}
-            <div>
-                {% for error in form.keyword_4.errors %}
-                    <span class='text-danger'>{{ error }}</span>
-                    <br>
-                {% endfor%}
-            </div>
-        {% else %}
-            {{ form.keyword_4(class="form-control form-control-lg  border-success") }}
-        {% endif %}
-    </div>
-    <div class="form-group mx-sm-5 mb-2">
-        <label>{{ form.keyword_5.label }}</label>
-        {% if form.keyword_5.errors %}
-            {{ form.keyword_5(class="form-control form-control-lg border-danger") }}
-            <div>
-                {% for error in form.keyword_5.errors %}
-                    <span class='text-danger'>{{ error }}</span>
-                    <br>
-                {% endfor%}
-            </div>
-        {% else %}
-            {{ form.keyword_5(class="form-control form-control-lg  border-success") }}
-        {% endif %}
-    </div>
-    <div class="form-group mx-sm-5 mb-2">
-        <label>{{ form.count.label }}</label>
-        {% if form.count.errors %}
-            {{ form.count(class="form-control form-control-lg border-danger") }}
-            <div>
-                {% for error in form.count.errors %}
-                    <span class='text-danger'>{{ error }}</span>
-                    <br>
-                {% endfor%}
-            </div>
-        {% else %}
-            {{ form.count(class="form-control form-control-lg  border-success") }}
-        {% endif %}
-    </div>
-
-    {{ form.submit(class="btn btn-lg btn-info btn-block mt-4 mb-5") }}
 </form>
 
     <table class="table text-center">

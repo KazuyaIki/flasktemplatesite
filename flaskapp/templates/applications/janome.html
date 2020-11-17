@@ -6,7 +6,7 @@
 <form method="POST" class='form mx-auto w-75'>
     {{ form.csrf_token }}
     <div class="form-group mx-sm-3 mb-2">
-        <label>{{ form.text.label }}</label>
+        <label><h4>{{ form.text.label }}</h4></label>
         {% if form.text.errors %}
             {{ form.text(class="form-control form-control-lg border-danger") }}
             <div>
@@ -22,8 +22,8 @@
     {% if letter_counter %}
     <h4 class='text-right text-warning'>letter counter : {{ letter_counter }}</h4>
     {% endif %}
-    <div class="form-group mx-sm-3 mb-2">
-        <label>{{ form.parts_of_speech.label }}</label>
+    <div class="form-group mx-sm-3 mb-2 mt-5">
+        <label><h4>{{ form.parts_of_speech.label }}</h4></label>
         <div>
             {% if form.parts_of_speech.errors %}
                 {% for error in form.parts_of_speech.errors %}
@@ -31,9 +31,9 @@
                 {% endfor%}
             {% endif %}
         </div>
-        <ul class='list-group list-group-horizontal'>
+        <ul class='list-group list-group-horizontal justify-content-around'>
             {% for part_of_speech in form.parts_of_speech %}
-            <li class="list-group-item">{{ part_of_speech }} {{ part_of_speech.label }}</li>
+            <li class="list-group-item"><h4>{{ part_of_speech }} {{ part_of_speech.label }}</h4></li>
             {% endfor %}
         </ul>
     </div>

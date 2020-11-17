@@ -26,5 +26,12 @@
 <div class='text-center'>
     <img src="{{ url_for('static', filename=path) }}">
 </div>
+<br>
+<div class='text-center mt-3 mb-5'>
+<a class="mx-auto" href="{{ url_for('applications.download_wordcloud', path=path[-18:]) }}" target="blank">
+    <button type="button" class="btn btn-danger btn-lg px-5">Download Image</button>
+</a>
+</div>
+
 {% endif %}
 {% endblock content %}

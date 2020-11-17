@@ -37,7 +37,7 @@ class TweetSearchForm(Form):
     keyword_2 = StringField('Keyword_2 :', validators=[Length(min=0, max=10)], default='')
     keyword_4 = StringField('Keyword_4 :', validators=[Length(min=0, max=10)], default='')
     keyword_5 = StringField('Keyword_5 :', validators=[Length(min=0, max=10)], default='')
-    count = IntegerField('the number of tweets you need :', validators=[DataRequired(), NumberRange(1,100)])
+    count = IntegerField('the number of tweets :', validators=[DataRequired(), NumberRange(1,100)])
     submit = SubmitField('Show Tweets')
 
 class SeleniumBsForm(Form):

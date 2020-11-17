@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask import render_template, url_for, request, redirect, flash
+from flask import render_template, url_for, request, redirect, flash, jsonify
 from flaskapp import db
 from .forms import RegistrationForm, SetPasswordForm, LoginForm, LogoutForm, WordCloudForm, JanomeForm, TweetSearchForm, SeleniumBsForm, AddcartForm, AddProductForm, ProductEditForm
 from .models import Registration, User, Product, Cart
@@ -11,18 +11,24 @@ from flaskapp.applications.wordcloud import word_cloud
 from flaskapp.applications.janome import jano_me
 from flaskapp.applications.tweepy import tweet_search
 from flaskapp.applications.selenium_bs import seleniumbs, seleniumbs_plt
+from flask import send_file
+import os
+import numpy as np
 
 
 main = Blueprint('main', __name__, url_prefix='')
 applications = Blueprint('applications', __name__, url_prefix='/applications')
 
+random_decimal = np.random.rand()
 
-
-
+@main.route('/update_decimal', methods=['POST'])
+def updatedecimal():
+    random_decimal = np.random.rand()
+    return jsonify('', render_template('main/random_decimal_model.html', x=random_decimal))
 
 @main.route('/')
 def home():
-    return render_template('main/home.html')
+    return render_template('main/home.html', x=random_decimal)
 
 @applications.route('/bs4')
 def bs4():
@@ -125,6 +131,15 @@ def wordcloud():
         form.text.data = ''
         return render_template('applications/wordcloud.html', form=form, path=path)
     return render_template('applications/wordcloud.html', form=form)
+
+@applications.route('/download_wordcloud/images/wordcloud/<string:path>')
+@login_required
+def download_wordcloud(path):
+    basedir = os.path.abspath(os.path.dirname(__name__))
+    file_abs_path = os.path.join(basedir, f"flaskapp\\static\\images\\wordcloud\\{path}")
+    name = file_abs_path[-18:]
+    return send_file(file_abs_path, as_attachment=True, attachment_filename=name)
+
 
 @applications.route('/janome', methods=['GET', 'POST'])
 @login_required

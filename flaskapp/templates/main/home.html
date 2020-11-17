@@ -21,4 +21,29 @@ home-{{ super() }}
     <a class="btn btn-primary btn-lg" href="{{ url_for('main.registration') }}" role="button">Register now</a>
     {% endif %}
 </div>
+
+<h4>Ajax test -np.random.rand(): </h4>
+<h4><div id="random_decimal">{{ x }}</div></h4>
+
 {% endblock content %}
+{% block script%}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+     $(function(){
+         window.setInterval(function(){
+             loadNewDecimal()
+         }, 10000)
+
+        function loadNewDecimal(){
+            $.ajax({
+                url: '/update_decimal',
+                type: 'POST',
+                dataType: 'json',
+                success: function(data){
+                    $(random_decimal).replaceWith(data)
+                }
+            });
+        }
+     });
+</script>
+{% endblock %}

@@ -17,7 +17,8 @@ def send_email(email_address, url):
     send_name = "New User" #送信先の名前
     today_date = datetime.today()
     subject = f"Dear {send_name}, please set your Password({today_date})"
-    body = f"please set your password at<br>   {url}<br>within 24 hours"
+    prefix_url = os.environ.get("PREFIX_URL")
+    body = f"please set your password at<br>   {prefix_url}/{url}<br>within 24 hours"
     msg = MIMEText(body, "html") #print(msg)でアルファベット・数字の文字列で表示されていても大丈夫
     msg['Subject'] = subject
     msg['To'] = mail_to

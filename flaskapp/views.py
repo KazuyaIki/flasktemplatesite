@@ -44,7 +44,7 @@ def registration():
             new_record.token = str(uuid4())
             new_record.created_at = datetime.now()
             new_record.valid_until = datetime.now() + timedelta(days=1)
-            url = f"http://127.0.0.1:5000/setpassword/{form.username.data}/{new_record.token}"
+            url = f"setpassword/{form.username.data}/{new_record.token}"
             if User.select_user_by_username(new_record.username):
                 flash('The username is already taken', 'danger')
             elif User.select_user_by_email(new_record.email):

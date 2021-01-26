@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block title %}program_update{{ super() }}{% endblock %}
+
+{% block content %}
+<h2 class="display-4 m-5 text-center font-weight-bold text-info">
+    プログラムを更新してください
+</h2>
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">file</th>
+        <th scope="col">update</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">vies.py</th>
+        <td>{{ username }} = Blueprint('{{ username }}', __name__, url_prefix='/{{ url_prefix }}')<br>
+            @{{ username }}.route('/invoice_input', methods=['GET', 'POST'])<br>
+            @{{ username }}.route('/pdf/<timestamp>')
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">__init__.py</th>
+        <td>from flaskapp.views import {{ username }}<br>
+            app.register_blueprint({{ username }})
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">New File</th>
+        <td colspan="2">templates/{{ username }}/invoice_template.html<br>
+                        static/{{ username }}/stamp.png
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">invoice_template.html</th>
+        <td colspan="2">{{ username }}.invoice_writer<br>
+                        filename='{{ username }}/stamp.png'
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+{% endblock content %}

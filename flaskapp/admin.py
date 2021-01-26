@@ -9,4 +9,4 @@ class MyAdminIndexView(AdminIndexView):
     def _handle_view(self, name, **kwargs):
         if not self.is_accessible():
             flash('Denied to access', 'danger') #直接URLに/adminを入れた場合に対応
-            return redirect(url_for("main.home"))
+            return redirect(url_for("main.login"))

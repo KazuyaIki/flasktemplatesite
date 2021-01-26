@@ -1,18 +1,6 @@
-from wtforms import Form, IntegerField, StringField, TextAreaField, PasswordField, SubmitField, BooleanField, DateField, HiddenField, RadioField, SelectField, validators, ValidationError
-from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange
-from flaskapp.models import User, Product
-
-class RegistrationForm(Form):
-    username = StringField('User Name :', validators=[DataRequired(), Length(min=6, max=32, message='length must be between 6 to 32')])
-    email = StringField('Email :', validators=[DataRequired(), Email('not recognized as email-address')])
-    email_confirm = StringField('Email(confirmation): ', validators=[DataRequired(), EqualTo('email', message="Email doesn't match")])
-    submit = SubmitField('Register')
-
-
-class SetPasswordForm(Form):
-    password = PasswordField('Password: ', validators=[DataRequired(),Length(min=8, max=32, message='length must be between 8 to 32')])
-    password_confirm = PasswordField('Password confirm: ', validators=[DataRequired(), EqualTo('password', message="Password doesn't match")])
-    submit = SubmitField('Submit')
+from wtforms import Form, IntegerField, StringField, PasswordField, SubmitField, validators, ValidationError, BooleanField, DateField
+from wtforms.validators import DataRequired, Email
+from flaskapp.models import Users
 
 class LoginForm(Form):
     email = StringField('Email address :', validators=[DataRequired(), Email()])
@@ -22,48 +10,36 @@ class LoginForm(Form):
 class LogoutForm(Form):
     submit = SubmitField('Logout')
 
-class WordCloudForm(Form):
-    text = TextAreaField('Text :', validators=[DataRequired(), Length(min=500, message='the number of letters must be over 500')])
-    submit = SubmitField('Show Wordcloud')
+class CreateUserForm(Form):
+    username = StringField('username: ', validators=[DataRequired()])
+    email = StringField('email: ', validators=[DataRequired()])
+    password = PasswordField('password: ', validators=[DataRequired()])
+    submit = SubmitField('ユーザー作成')
 
-class JanomeForm(Form):
-    text = TextAreaField('Text :', validators=[DataRequired(), Length(min=500, message='the number of letters must be over 500')])
-    parts_of_speech = RadioField('Select a part of speech :', validators=[DataRequired('Please select a part of speech')], choices=[('名詞','Noun'), ('動詞','Verb'), ('形容詞','Adjective'), ('副詞','Adverb')], default='')
-    submit = SubmitField('Show Result')
+class InvoiceForm(Form):
+    invoice_no = StringField('整理番号 :', validators=[DataRequired()], default='00-0000')
+    invoice_to = StringField('宛先（御中/様を含めて） :', validators=[DataRequired()])
+    date_issued = StringField('請求書発行日 :', validators=[DataRequired()], default='令和　年　月　日')
+    date_issued_quotation = StringField('見積書発行日 :', validators=[DataRequired()], default='令和　年　月　日')
+    date_issued_delivery = StringField('納品書発行日 :', validators=[DataRequired()], default='令和　年　月　日')
+    date_issued_receipt = StringField('領収書発行日 :', validators=[DataRequired()], default='令和　年　月　日')
+    p1_name = StringField('品名（備考）_1 :',validators=[DataRequired()])
+    p1_quantity = IntegerField('数量 _1 :',validators=[DataRequired()], default=1)
+    p1_unit_price = IntegerField('単価（税込）_1 :',validators=[DataRequired()])
+    p2_name = StringField('品名（備考）_2 :')
+    p2_quantity = IntegerField('数量_2 :', default=0)
+    p2_unit_price = IntegerField('単価（税込）_2 :', default=0)
+    p3_name = StringField('品名（備考）_3 :')
+    p3_quantity = IntegerField('数量_3 :', default=0)
+    p3_unit_price = IntegerField('単価（税込）_3 :', default=0)
+    p4_name = StringField('品名（備考） _4:')
+    p4_quantity = IntegerField('数量_4 :', default=0)
+    p4_unit_price = IntegerField('単価（税込） _4 :', default=0)
+    p5_name = StringField('品名（備考）_5 :')
+    p5_quantity = IntegerField('数量_5 :', default=0)
+    p5_unit_price = IntegerField('単価（税込）_5 :', default=0)
+    p6_name = StringField('品名（備考）_6 :')
+    p6_quantity = IntegerField('数量_6 :', default=0)
+    p6_unit_price = IntegerField('単価（税込）_6 :', default=0)
 
-class TweetSearchForm(Form):
-    keyword_1 = StringField('Keyword_1 :', validators=[DataRequired(), Length(min=1, max=10)])
-    keyword_3 = StringField('Keyword_3 :', validators=[Length(min=0, max=10)], default='')
-    keyword_2 = StringField('Keyword_2 :', validators=[Length(min=0, max=10)], default='')
-    keyword_4 = StringField('Keyword_4 :', validators=[Length(min=0, max=10)], default='')
-    keyword_5 = StringField('Keyword_5 :', validators=[Length(min=0, max=10)], default='')
-    count = IntegerField('the number of tweets :', validators=[DataRequired(), NumberRange(1,100)])
-    submit = SubmitField('Show Tweets')
-
-class SeleniumBsForm(Form):
-    keywords = StringField('Keywords :', validators=[DataRequired(), Length(min=1, max=10)])
-    submit = SubmitField('Show Result')
-
-class AddcartForm(Form):
-    product_id = HiddenField()
-    submit = SubmitField('Add Cart')
-
-class AddProductForm(Form):
-    product_name = StringField('Product Name :', validators=[DataRequired()])
-    price = IntegerField('Price :', validators=[DataRequired()])
-    stock = IntegerField('Stock :', validators=[DataRequired()])
-    comment = StringField('Comment :')
-    image_path = StringField('Image Path :')
-    submit = SubmitField('Add New Product')
-
-    def validate_product_name(self, field):
-        if Product.select_product_by_name(field.data):
-            raise ValidationError('The item is already listed')
-
-class ProductEditForm(Form):
-    product_name = StringField('Product Name :', validators=[DataRequired()])
-    price = IntegerField('Price :', validators=[DataRequired()])
-    stock = IntegerField('Stock :', validators=[DataRequired()])
-    comment = StringField('Comment :')
-    image_path = StringField('Image Path :')
-    submit = SubmitField('Edit Product')
+    submit = SubmitField('選択・入力した書類を表示')

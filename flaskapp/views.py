@@ -1,106 +1,37 @@
-from flask import Blueprint
-from flask import render_template, url_for, request, redirect, flash, jsonify
+from flask import Blueprint, session
+from flask import render_template, url_for, request, redirect, flash, make_response
+import pdfkit
 from flaskapp import db
-from .forms import RegistrationForm, SetPasswordForm, LoginForm, LogoutForm, WordCloudForm, JanomeForm, TweetSearchForm, SeleniumBsForm, AddcartForm, AddProductForm, ProductEditForm
-from .models import Registration, User, Product, Cart
-from datetime import datetime, timedelta
-from uuid import uuid4
-from flaskapp.send_email import send_email
+from .forms import LoginForm, LogoutForm, InvoiceForm, CreateUserForm
+from .models import Users
+from datetime import datetime
 from flask_login import login_user, login_required, logout_user, current_user
-from flaskapp.applications.wordcloud import word_cloud
-from flaskapp.applications.janome import jano_me
-from flaskapp.applications.tweepy import tweet_search
-from flaskapp.applications.selenium_bs import seleniumbs, seleniumbs_plt
-from flask import send_file
 import os
-import numpy as np
+from base64 import b64encode
+from uuid import uuid4
 
 
 main = Blueprint('main', __name__, url_prefix='')
-applications = Blueprint('applications', __name__, url_prefix='/applications')
+KazuyaIki = Blueprint('KazuyaIki', __name__, url_prefix='/0123456789')
+template_user = Blueprint('template_user', __name__, url_prefix='/template_template_template')
+guestuser = Blueprint('guestuser', __name__, url_prefix='/d6e5c00c-056c-4bcb-8dc7-c8413518eecb')
+guest2 = Blueprint('guest2', __name__, url_prefix='/4485d2f6-29dd-41fb-980c-c5d1bb29e38a')
 
-random_decimal = np.random.rand()
 
-@main.route('/update_decimal', methods=['POST'])
-def updatedecimal():
-    random_decimal = np.random.rand()
-    return jsonify('', render_template('main/random_decimal_model.html', x=random_decimal))
 
-@main.route('/')
-def home():
-    return render_template('main/home.html', x=random_decimal)
-
-@applications.route('/lists')
-def lists():
-    return render_template('applications/lists.html')
-
-@main.route('/registration', methods=['GET', 'POST'])
-def registration():
-    logout_user()
-    form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
-        try:
-            new_record = Registration(username=form.username.data, email=form.email.data)
-            new_record.token = str(uuid4())
-            new_record.created_at = datetime.now()
-            new_record.valid_until = datetime.now() + timedelta(days=1)
-            url = f"setpassword/{form.username.data}/{new_record.token}"
-            if User.select_user_by_username(new_record.username):
-                flash('The username is already taken', 'danger')
-            elif User.select_user_by_email(new_record.email):
-                flash('The email is already registered', 'danger')
-            else:
-                new_record.create_new_record()
-                flash('Check your email and set your password, please', 'success')
-
-                send_email(new_record.email, url)
-            return redirect(url_for('main.home'))
-        except:
-            flash('no internet connection')
-            return redirect(url_for('main.registration'))
-    return render_template('main/registration.html', form=form)
-
-@main.route('/setpassword/<string:username>/<string:token>', methods=['GET', 'POST'])
-def setpassword(username, token):
-    logout_user()
-    form = SetPasswordForm(request.form)
-    user = Registration.select_user_by_username(username)
-    email = user.email
-    valid_until = user.valid_until
-    if request.method == 'POST' and form.validate():
-        if valid_until > datetime.now():
-            if User.select_user_by_password(form.password.data):
-                flash('the password is not available', 'danger')
-            else:
-                new_user = User(username, email, form.password.data)
-                new_user.is_active = True
-                new_user.created_at = datetime.now()
-                new_user.updated_at = datetime.now()
-                new_user.create_new_user()
-                user.is_registered = True ###これが働かない
-                flash('please login with your username and password', 'primary')
-                return redirect(url_for('main.login'))
-        else:
-            flash('overtime, register again', 'danger')
-            return redirect(url_for('main.registration'))
-    return render_template('main/setpassword.html', form=form)
-
-@main.route('/login', methods=['GET', 'POST'])
+@main.route('/', methods=['GET', 'POST'])
 def login():
-    logout_user()
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         email = form.email.data
         password = form.password.data
-        user = User.select_user_by_email(email)
+        user = Users.select_user_by_email(email)
         if user:
+            username = user.username
             if user.password == password:
                 login_user(user, remember=True)
-                next = request.args.get('next')
-                if not next:
-                    next = url_for('main.home')
                 flash('You logged in successfully', 'success')
-                return redirect(next)
+                return redirect(url_for(f'{username}.invoice_input'))
             else:
                 flash("the password is wrong", 'danger')
         else:
@@ -114,159 +45,385 @@ def logout():
     if request.method == 'POST':
         logout_user()
         flash('You logged out', 'success')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.login'))
     return render_template('main/logout.html', form=form)
 
-@applications.route('/wordcloud', methods=['GET', 'POST'])
+@main.route('/create_user', methods=['GET', 'POST'])
 @login_required
-def wordcloud():
-    form = WordCloudForm(request.form)
-    if request.method == 'POST' and form.validate():
-        text = form.text.data
-        path = word_cloud(text)
-        form.text.data = ''
-        return render_template('applications/wordcloud.html', form=form, path=path)
-    return render_template('applications/wordcloud.html', form=form)
+def create_user():
+    form = CreateUserForm(request.form)
+    if current_user.is_admin:
+        if request.method == 'POST' and form.validate():
+            username = form.username.data
+            email = form.email.data
+            password = form.password.data
+            url_prefix = str(uuid4())
+            created_at = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+            new_user = Users(username, email, password, url_prefix, created_at)
+            new_user.create_new_user()
+            flash('NEW USER CREATED')
+            return render_template('main/update_program.html', username=username, url_prefix=url_prefix)
+        return render_template('main/create_user.html', form=form)
+    return redirect(url_for('login'))
 
-@applications.route('/download_wordcloud/images/wordcloud/<string:path>')
+@main.route('/invoice_input', methods=['GET', 'POST'])
 @login_required
-def download_wordcloud(path):
+def invoice_input():
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    username = user.username
+    form = InvoiceForm(request.form)
+    if request.method == 'POST' and form.validate():
+        session['invoice_to'] = form.invoice_to.data
+        session['invoice_no'] = form.invoice_no.data
+        session['date_issued'] =form.date_issued.data
+        session['date_issued_quotation'] =form.date_issued_quotation.data
+        session['date_issued_delivery'] =form.date_issued_delivery.data
+        session['date_issued_receipt'] =form.date_issued_receipt.data
+        session['p1_name'] = form.p1_name.data
+        session['p1_quantity'] = int(form.p1_quantity.data)
+        session['p1_unit_price'] = int(form.p1_unit_price.data)
+        session['p2_name'] = form.p2_name.data
+        session['p2_quantity'] = int(form.p2_quantity.data)
+        session['p2_unit_price'] = int(form.p2_unit_price.data)
+        session['p3_name'] = form.p3_name.data
+        session['p3_quantity'] = int(form.p3_quantity.data)
+        session['p3_unit_price'] = int(form.p3_unit_price.data)
+        session['p4_name'] = form.p4_name.data
+        session['p4_quantity'] = int(form.p4_quantity.data)
+        session['p4_unit_price'] = int(form.p4_unit_price.data)
+        session['p5_name'] = form.p5_name.data
+        session['p5_quantity'] = int(form.p5_quantity.data)
+        session['p5_unit_price'] = int(form.p5_unit_price.data)
+        session['p6_name'] = form.p6_name.data
+        session['p6_quantity'] = int(form.p6_quantity.data)
+        session['p6_unit_price'] = int(form.p6_unit_price.data)
+        session['p1_total_price'] = session['p1_unit_price'] * session['p1_quantity']
+        session['p2_total_price'] = session['p2_unit_price'] * session['p2_quantity']
+        session['p3_total_price'] = session['p3_unit_price'] * session['p3_quantity']
+        session['p4_total_price'] = session['p4_unit_price'] * session['p4_quantity']
+        session['p5_total_price'] = session['p5_unit_price'] * session['p5_quantity']
+        session['p6_total_price'] = session['p6_unit_price'] * session['p6_quantity']
+        session['total_price'] = session['p1_total_price'] + session['p2_total_price'] + session['p3_total_price'] + session['p4_total_price'] + session['p5_total_price'] + session['p6_total_price']
+        today = datetime.today()
+        timestamp = str( f'{today:%y%m%d}')
+        session['quo'] = request.form.get('quotation', '')
+        session['deli'] = request.form.get('delivery', '')
+        session['inv'] = request.form.get('invoice', '')
+        session['rec'] = request.form.get('receipt', '')
+        return render_template(f'{username}/invoice_template.html', timestamp=timestamp)
+    return render_template('main/input_invoice.html', form=form)
+
+@main.app_errorhandler(404)
+def page_not_found(e):
+    flash('Redirected for Login Page', 'primary')
+    return redirect(url_for('main.login'))
+
+@main.route('/pdf/invoice/<timestamp>')
+@login_required
+def invoice_writer(timestamp):
+    url = request.path
     basedir = os.path.abspath(os.path.dirname(__name__))
-    file_abs_path = os.path.join(basedir, f"flaskapp\\static\\images\\wordcloud\\{path}")
-    name = file_abs_path[-18:]
-    return send_file(file_abs_path, as_attachment=True, attachment_filename=name)
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    user_name = user.username
+    stamp_path = os.path.join(basedir, f"flaskapp/static/{username}/stamp.png")
+    # stamp_path_b64 = os.path.join(basedir, "flaskapp/static/{username}/stamp_b64.txt")
+    with open(stamp_path, 'rb') as f:
+        img_b = f.read()
+    img_b64 = b64encode(img_b)
+    img_b64_str = img_b64.decode()
+    rendered = render_template(f'{username}/invoice_template.html', url=url, img_b64_str=img_b64_str)
+    config = pdfkit.configuration(wkhtmltopdf='wkhtmltopdf.exe')
+    options = {'enable-local-file-access': None}
+    pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
 
-
-@applications.route('/janome', methods=['GET', 'POST'])
+@KazuyaIki.route('/invoice_input', methods=['GET', 'POST'])
 @login_required
-def janome():
-    form = JanomeForm(request.form)
+def invoice_input():
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    username = user.username
+    url_prefix = user.url_prefix
+    form = InvoiceForm(request.form)
     if request.method == 'POST' and form.validate():
-        pos = form.parts_of_speech.data
-        text = form.text.data
-        word_dict = jano_me(pos, text)
-        letter_counter = int(len(text))
-        sum_of_words = 0
-        for _, v in word_dict:
-            sum_of_words += int(v)
-        return render_template('applications/janome.html', form=form, word_dict=word_dict, pos=pos, sum_of_words=sum_of_words, letter_counter=letter_counter)
-    return render_template('applications/janome.html', form=form)
+        session['invoice_to'] = form.invoice_to.data
+        session['invoice_no'] = form.invoice_no.data
+        session['date_issued'] =form.date_issued.data
+        session['date_issued_quotation'] =form.date_issued_quotation.data
+        session['date_issued_delivery'] =form.date_issued_delivery.data
+        session['date_issued_receipt'] =form.date_issued_receipt.data
+        session['p1_name'] = form.p1_name.data
+        session['p1_quantity'] = int(form.p1_quantity.data)
+        session['p1_unit_price'] = int(form.p1_unit_price.data)
+        session['p2_name'] = form.p2_name.data
+        session['p2_quantity'] = int(form.p2_quantity.data)
+        session['p2_unit_price'] = int(form.p2_unit_price.data)
+        session['p3_name'] = form.p3_name.data
+        session['p3_quantity'] = int(form.p3_quantity.data)
+        session['p3_unit_price'] = int(form.p3_unit_price.data)
+        session['p4_name'] = form.p4_name.data
+        session['p4_quantity'] = int(form.p4_quantity.data)
+        session['p4_unit_price'] = int(form.p4_unit_price.data)
+        session['p5_name'] = form.p5_name.data
+        session['p5_quantity'] = int(form.p5_quantity.data)
+        session['p5_unit_price'] = int(form.p5_unit_price.data)
+        session['p6_name'] = form.p6_name.data
+        session['p6_quantity'] = int(form.p6_quantity.data)
+        session['p6_unit_price'] = int(form.p6_unit_price.data)
+        session['p1_total_price'] = session['p1_unit_price'] * session['p1_quantity']
+        session['p2_total_price'] = session['p2_unit_price'] * session['p2_quantity']
+        session['p3_total_price'] = session['p3_unit_price'] * session['p3_quantity']
+        session['p4_total_price'] = session['p4_unit_price'] * session['p4_quantity']
+        session['p5_total_price'] = session['p5_unit_price'] * session['p5_quantity']
+        session['p6_total_price'] = session['p6_unit_price'] * session['p6_quantity']
+        session['total_price'] = session['p1_total_price'] + session['p2_total_price'] + session['p3_total_price'] + session['p4_total_price'] + session['p5_total_price'] + session['p6_total_price']
+        today = datetime.today()
+        timestamp = str( f'{today:%y%m%d}')
+        session['quo'] = request.form.get('quotation', '')
+        session['deli'] = request.form.get('delivery', '')
+        session['inv'] = request.form.get('invoice', '')
+        session['rec'] = request.form.get('receipt', '')
+        return render_template(f'{username}/invoice_template.html', timestamp=timestamp, url_prefix=url_prefix)
+    return render_template('main/input_invoice.html', form=form, username=username)
 
-@applications.route('/tweetsearch', methods=['GET', 'POST'])
+@KazuyaIki.route('/pdf/<timestamp>')
 @login_required
-def tweetsearch():
-    form = TweetSearchForm(request.form)
+def invoice_writer(timestamp):
+    url = request.path
+    basedir = os.path.abspath(os.path.dirname(__name__))
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    username = user.username
+    stamp_path = os.path.join(basedir, f"flaskapp/static/{username}/stamp.png")
+    # stamp_path_b64 = os.path.join(basedir, "flaskapp/static/{username}/stamp_b64.txt")
+    with open(stamp_path, 'rb') as f:
+        img_b = f.read()
+    img_b64 = b64encode(img_b)
+    img_b64_str = img_b64.decode()
+    rendered = render_template(f'{username}/invoice_template.html', url=url, img_b64_str=img_b64_str)
+    config = pdfkit.configuration(wkhtmltopdf='wkhtmltopdf.exe')
+    options = {'enable-local-file-access': None}
+    pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
+
+@template_user.route('/invoice_input', methods=['GET', 'POST'])
+@login_required
+def invoice_input():
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    username = user.username
+    url_prefix = user.url_prefix
+    form = InvoiceForm(request.form)
     if request.method == 'POST' and form.validate():
-        k = [form.keyword_1.data, form.keyword_2.data, form.keyword_3.data, form.keyword_4.data, form.keyword_5.data]
-        keywords = [i + ' -RT' for i in k if i]
-        count = form.count.data
-        tweet_list = tweet_search(keywords, count)
-        return render_template('applications/tweetsearch.html', form=form, tweet_list=tweet_list)
-    return render_template('applications/tweetsearch.html', form=form)
+        session['invoice_to'] = form.invoice_to.data
+        session['invoice_no'] = form.invoice_no.data
+        session['date_issued'] =form.date_issued.data
+        session['date_issued_quotation'] =form.date_issued_quotation.data
+        session['date_issued_delivery'] =form.date_issued_delivery.data
+        session['date_issued_receipt'] =form.date_issued_receipt.data
+        session['p1_name'] = form.p1_name.data
+        session['p1_quantity'] = int(form.p1_quantity.data)
+        session['p1_unit_price'] = int(form.p1_unit_price.data)
+        session['p2_name'] = form.p2_name.data
+        session['p2_quantity'] = int(form.p2_quantity.data)
+        session['p2_unit_price'] = int(form.p2_unit_price.data)
+        session['p3_name'] = form.p3_name.data
+        session['p3_quantity'] = int(form.p3_quantity.data)
+        session['p3_unit_price'] = int(form.p3_unit_price.data)
+        session['p4_name'] = form.p4_name.data
+        session['p4_quantity'] = int(form.p4_quantity.data)
+        session['p4_unit_price'] = int(form.p4_unit_price.data)
+        session['p5_name'] = form.p5_name.data
+        session['p5_quantity'] = int(form.p5_quantity.data)
+        session['p5_unit_price'] = int(form.p5_unit_price.data)
+        session['p6_name'] = form.p6_name.data
+        session['p6_quantity'] = int(form.p6_quantity.data)
+        session['p6_unit_price'] = int(form.p6_unit_price.data)
+        session['p1_total_price'] = session['p1_unit_price'] * session['p1_quantity']
+        session['p2_total_price'] = session['p2_unit_price'] * session['p2_quantity']
+        session['p3_total_price'] = session['p3_unit_price'] * session['p3_quantity']
+        session['p4_total_price'] = session['p4_unit_price'] * session['p4_quantity']
+        session['p5_total_price'] = session['p5_unit_price'] * session['p5_quantity']
+        session['p6_total_price'] = session['p6_unit_price'] * session['p6_quantity']
+        session['total_price'] = session['p1_total_price'] + session['p2_total_price'] + session['p3_total_price'] + session['p4_total_price'] + session['p5_total_price'] + session['p6_total_price']
+        today = datetime.today()
+        timestamp = str( f'{today:%y%m%d}')
+        session['quo'] = request.form.get('quotation', '')
+        session['deli'] = request.form.get('delivery', '')
+        session['inv'] = request.form.get('invoice', '')
+        session['rec'] = request.form.get('receipt', '')
+        return render_template(f'{username}/invoice_template.html', timestamp=timestamp, url_prefix=url_prefix)
+    return render_template('main/input_invoice.html', form=form, username=username)
 
-@applications.route('/selenium_bs', methods=['GET', 'POST'])
+@template_user.route('/pdf/<timestamp>')
 @login_required
-def selenium_bs():
-    form = SeleniumBsForm(request.form)
+def invoice_writer(timestamp):
+    url = request.path
+    basedir = os.path.abspath(os.path.dirname(__name__))
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    username = user.username
+    stamp_path = os.path.join(basedir, f"flaskapp/static/{username}/stamp.png")
+    # stamp_path_b64 = os.path.join(basedir, "flaskapp/static/{username}/stamp_b64.txt")
+    with open(stamp_path, 'rb') as f:
+        img_b = f.read()
+    img_b64 = b64encode(img_b)
+    img_b64_str = img_b64.decode()
+    rendered = render_template(f'{username}/invoice_template.html', url=url, img_b64_str=img_b64_str)
+    config = pdfkit.configuration(wkhtmltopdf='wkhtmltopdf.exe')
+    options = {'enable-local-file-access': None}
+    pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
+
+@guestuser.route('/invoice_input', methods=['GET', 'POST'])
+@login_required
+def invoice_input():
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    username = user.username
+    url_prefix = user.url_prefix
+    form = InvoiceForm(request.form)
     if request.method == 'POST' and form.validate():
-        keywords = form.keywords.data
-        car_list = seleniumbs(keywords)
-        time = seleniumbs_plt(car_list)
-        filename = f'images/selenium_bs/{time}.jpeg'
-        return render_template('applications/selenium_bs.html', form=form, car_list=car_list, filename=filename)
-    return render_template('applications/selenium_bs.html', form=form)
+        session['invoice_to'] = form.invoice_to.data
+        session['invoice_no'] = form.invoice_no.data
+        session['date_issued'] =form.date_issued.data
+        session['date_issued_quotation'] =form.date_issued_quotation.data
+        session['date_issued_delivery'] =form.date_issued_delivery.data
+        session['date_issued_receipt'] =form.date_issued_receipt.data
+        session['p1_name'] = form.p1_name.data
+        session['p1_quantity'] = int(form.p1_quantity.data)
+        session['p1_unit_price'] = int(form.p1_unit_price.data)
+        session['p2_name'] = form.p2_name.data
+        session['p2_quantity'] = int(form.p2_quantity.data)
+        session['p2_unit_price'] = int(form.p2_unit_price.data)
+        session['p3_name'] = form.p3_name.data
+        session['p3_quantity'] = int(form.p3_quantity.data)
+        session['p3_unit_price'] = int(form.p3_unit_price.data)
+        session['p4_name'] = form.p4_name.data
+        session['p4_quantity'] = int(form.p4_quantity.data)
+        session['p4_unit_price'] = int(form.p4_unit_price.data)
+        session['p5_name'] = form.p5_name.data
+        session['p5_quantity'] = int(form.p5_quantity.data)
+        session['p5_unit_price'] = int(form.p5_unit_price.data)
+        session['p6_name'] = form.p6_name.data
+        session['p6_quantity'] = int(form.p6_quantity.data)
+        session['p6_unit_price'] = int(form.p6_unit_price.data)
+        session['p1_total_price'] = session['p1_unit_price'] * session['p1_quantity']
+        session['p2_total_price'] = session['p2_unit_price'] * session['p2_quantity']
+        session['p3_total_price'] = session['p3_unit_price'] * session['p3_quantity']
+        session['p4_total_price'] = session['p4_unit_price'] * session['p4_quantity']
+        session['p5_total_price'] = session['p5_unit_price'] * session['p5_quantity']
+        session['p6_total_price'] = session['p6_unit_price'] * session['p6_quantity']
+        session['total_price'] = session['p1_total_price'] + session['p2_total_price'] + session['p3_total_price'] + session['p4_total_price'] + session['p5_total_price'] + session['p6_total_price']
+        today = datetime.today()
+        timestamp = str( f'{today:%y%m%d}')
+        session['quo'] = request.form.get('quotation', '')
+        session['deli'] = request.form.get('delivery', '')
+        session['inv'] = request.form.get('invoice', '')
+        session['rec'] = request.form.get('receipt', '')
+        return render_template(f'{username}/invoice_template.html', timestamp=timestamp, url_prefix=url_prefix)
+    return render_template('main/input_invoice.html', form=form, username=username)
 
-
-@applications.route('/store_manage', methods=['GET', 'POST'])
+@guestuser.route('/pdf/<timestamp>')
 @login_required
-def storemanage():
-    form = AddProductForm(request.form)
-    products = Product.query.all()
+def invoice_writer(timestamp):
+    url = request.path
+    basedir = os.path.abspath(os.path.dirname(__name__))
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    username = user.username
+    stamp_path = os.path.join(basedir, f"flaskapp/static/{username}/stamp.png")
+    # stamp_path_b64 = os.path.join(basedir, "flaskapp/static/{username}/stamp_b64.txt")
+    with open(stamp_path, 'rb') as f:
+        img_b = f.read()
+    img_b64 = b64encode(img_b)
+    img_b64_str = img_b64.decode()
+    rendered = render_template(f'{username}/invoice_template.html', url=url, img_b64_str=img_b64_str)
+    config = pdfkit.configuration(wkhtmltopdf='wkhtmltopdf.exe')
+    options = {'enable-local-file-access': None}
+    pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
+
+
+@guest2.route('/invoice_input', methods=['GET', 'POST'])
+@login_required
+def invoice_input():
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    username = user.username
+    url_prefix = user.url_prefix
+    form = InvoiceForm(request.form)
     if request.method == 'POST' and form.validate():
-        product_name = form.product_name.data
-        price = form.price.data
-        stock = form.stock.data
-        comment = form.comment.data
-        image_path = form.image_path.data
-        new_product = Product(product_name, price, stock, comment, image_path)
-        if not Product.select_product_by_name(product_name):
-            new_product.add_new_product()
-            return redirect(url_for('applications.storemanage',form= form, products=products))
-    return render_template('applications/store_manage.html', form= form, products=products)
+        session['invoice_to'] = form.invoice_to.data
+        session['invoice_no'] = form.invoice_no.data
+        session['date_issued'] =form.date_issued.data
+        session['date_issued_quotation'] =form.date_issued_quotation.data
+        session['date_issued_delivery'] =form.date_issued_delivery.data
+        session['date_issued_receipt'] =form.date_issued_receipt.data
+        session['p1_name'] = form.p1_name.data
+        session['p1_quantity'] = int(form.p1_quantity.data)
+        session['p1_unit_price'] = int(form.p1_unit_price.data)
+        session['p2_name'] = form.p2_name.data
+        session['p2_quantity'] = int(form.p2_quantity.data)
+        session['p2_unit_price'] = int(form.p2_unit_price.data)
+        session['p3_name'] = form.p3_name.data
+        session['p3_quantity'] = int(form.p3_quantity.data)
+        session['p3_unit_price'] = int(form.p3_unit_price.data)
+        session['p4_name'] = form.p4_name.data
+        session['p4_quantity'] = int(form.p4_quantity.data)
+        session['p4_unit_price'] = int(form.p4_unit_price.data)
+        session['p5_name'] = form.p5_name.data
+        session['p5_quantity'] = int(form.p5_quantity.data)
+        session['p5_unit_price'] = int(form.p5_unit_price.data)
+        session['p6_name'] = form.p6_name.data
+        session['p6_quantity'] = int(form.p6_quantity.data)
+        session['p6_unit_price'] = int(form.p6_unit_price.data)
+        session['p1_total_price'] = session['p1_unit_price'] * session['p1_quantity']
+        session['p2_total_price'] = session['p2_unit_price'] * session['p2_quantity']
+        session['p3_total_price'] = session['p3_unit_price'] * session['p3_quantity']
+        session['p4_total_price'] = session['p4_unit_price'] * session['p4_quantity']
+        session['p5_total_price'] = session['p5_unit_price'] * session['p5_quantity']
+        session['p6_total_price'] = session['p6_unit_price'] * session['p6_quantity']
+        session['total_price'] = session['p1_total_price'] + session['p2_total_price'] + session['p3_total_price'] + session['p4_total_price'] + session['p5_total_price'] + session['p6_total_price']
+        today = datetime.today()
+        timestamp = str( f'{today:%y%m%d}')
+        session['quo'] = request.form.get('quotation', '')
+        session['deli'] = request.form.get('delivery', '')
+        session['inv'] = request.form.get('invoice', '')
+        session['rec'] = request.form.get('receipt', '')
+        return render_template(f'{username}/invoice_template.html', timestamp=timestamp, url_prefix=url_prefix)
+    return render_template('main/input_invoice.html', form=form, username=username)
 
-@applications.route('/product_edit/<string:product_name>', methods=['GET', 'POST'])
+@guest2.route('/pdf/<timestamp>')
 @login_required
-def product_edit(product_name):
-    form = ProductEditForm(request.form)
-    product = Product.select_product_by_name(product_name)
-    id = product.id
-    if request.method == 'POST' and form.validate():
-        editted_product_name = form.product_name.data
-        editted_price = form.price.data
-        editted_stock = form.stock.data
-        editted_comment = form.comment.data
-        editted_image_path = form.image_path.data
-        if editted_product_name == product_name:
-            Product.product_update(id, editted_product_name, editted_price, editted_stock, editted_comment, editted_image_path)
-        elif Product.select_product_by_name(product_name=editted_product_name):
-            flash(f'{editted_product_name} already exists. Please check list again', 'danger')
-        else:
-            Product.product_update(id, editted_product_name, editted_price, editted_stock, editted_comment, editted_image_path)
-        return redirect(url_for('applications.storemanage'))
-    return render_template('applications/product_edit.html', form= form, product_name=product_name, product=product)
-
-
-@applications.route('/product_delete/<string:product_name>', methods=['GET', 'POST'])
-@login_required
-def productdelete(product_name):
-    product = Product.select_product_by_name(product_name)
-    id = product.id
-    Product.product_delete(id)
-    return redirect(url_for('applications.storemanage'))
-
-
-@applications.route('/store', methods=['GET'])
-@login_required
-def store():
-    form = AddcartForm(request.form)
-    products = Product.query.all()
-    # if request.method == 'POST' and form.validate():
-    #     product_id = form.product_id.data
-    #     addcart_product = Product.select_product_by_id(id=product_id)
-    #     product_info = f'{addcart_product.product_name}({addcart_product.price}) is added in your cart'
-    #     return render_template('applications/store.html', products=products, form=form, product_info=product_info)
-    if request.args.get('addcart_id',''):
-        product_id = request.args.get('addcart_id', '')
-        addcart_product = Product.select_product_by_id(id=product_id)
-        added_at = datetime.now()
-        new_cart = Cart(current_user.id, product_id, added_at)
-        new_cart.adding_cart()
-    return render_template('applications/store.html', products=products, form=form)
-
-@applications.route('my_cart/<string:user_name>', methods=['GET', 'POST'])
-@login_required
-def my_cart(user_name):
-    if request.args.get('deletecart_id', ''):
-        delete_cart_id = request.args.get('deletecart_id')
-        delete_item = Cart.query.get(delete_cart_id)
-        delete_item.delete_from_cart()
-    customer = User.select_user_by_username(user_name)
-    customer_id = customer.id
-    items_in_cart = Cart.select_items_in_cart(customer_id)
-    cart_ids = [i.id for i in items_in_cart]
-    items_id = [i.product_id for i in items_in_cart]
-    items =[]
-    for i, j in zip(items_id, cart_ids):
-        item = {}
-        item['image_path'] = Product.query.get(i).image_path
-        item['product_name'] = Product.query.get(i).product_name
-        item['price'] = Product.query.get(i).price
-        item['added_at'] = f'{Cart.query.get(j).added_at:%Y-%m-%d-%H:%M:%S}'
-        item['cart_id'] = j
-        items.append(item)
-        print(item['added_at'])
-    
-    return render_template('applications/my_cart.html', items=items)
-
+def invoice_writer(timestamp):
+    url = request.path
+    basedir = os.path.abspath(os.path.dirname(__name__))
+    user_id = current_user.get_id()
+    user = Users.select_user_by_id(user_id)
+    username = user.username
+    stamp_path = os.path.join(basedir, f"flaskapp/static/{username}/stamp.png")
+    # stamp_path_b64 = os.path.join(basedir, "flaskapp/static/{username}/stamp_b64.txt")
+    with open(stamp_path, 'rb') as f:
+        img_b = f.read()
+    img_b64 = b64encode(img_b)
+    img_b64_str = img_b64.decode()
+    rendered = render_template(f'{username}/invoice_template.html', url=url, img_b64_str=img_b64_str)
+    config = pdfkit.configuration(wkhtmltopdf='wkhtmltopdf.exe')
+    options = {'enable-local-file-access': None}
+    pdf = pdfkit.from_string(rendered, False, configuration=config, options=options)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
 
 

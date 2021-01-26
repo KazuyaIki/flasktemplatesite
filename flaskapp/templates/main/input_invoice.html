@@ -1,0 +1,416 @@
+{% extends "layout.html" %}
+{% block title %}input_invoice-{{ super() }}{% endblock %}
+
+{% block content %}
+<h2 class="display-4 m-5 text-center font-weight-bold text-info">
+    見積・納品・請求・領収書作成
+</h2>
+
+<form method="POST" class='form mx-auto w-85 mt-5'  target="_blank" rel="noopener noreferrer">
+    {{ form.csrf_token }}
+        
+        <div class="form-group text-center">
+            <label class="control-label h3">発行する書類を選択してください</label>
+            <br>
+            <div class="custom-control custom-checkbox h4 m-4" style='display:inline-block'>
+              <input type="checkbox" class="custom-control-input" name='quotation' value='quotation' id="custom-check-1" checked>
+              <label class="custom-control-label" for="custom-check-1">見積書</label>
+            </div>
+            <div class="custom-control custom-checkbox h4 m-4" style='display:inline-block'>
+              <input type="checkbox" class="custom-control-input" name='delivery' value='delivery' id="custom-check-2" checked>
+              <label class="custom-control-label" for="custom-check-2">納品書</label>
+            </div>
+            <div class="custom-control custom-checkbox h4 m-4" style='display:inline-block'>
+              <input type="checkbox" class="custom-control-input" name='invoice' value='invoice' id="custom-check-3" checked>
+              <label class="custom-control-label" for="custom-check-3">請求書</label>
+            </div>
+            <div class="custom-control custom-checkbox h4 m-4" style='display:inline-block'>
+              <input type="checkbox" class="custom-control-input" name='receipt' value='receipt' id="custom-check-4" checked>
+              <label class="custom-control-label" for="custom-check-4">領収書</label>
+            </div>
+        </div>
+
+    
+
+    <div class='row'>
+        <div class="form-group col-md-7">
+            <label class='mt-3'><h4>{{ form.invoice_to.label }}</h4></label>
+            {% if form.invoice_to.errors %}
+                {{ form.invoice_to(class="form-control form-control-md border-danger") }}
+                <div>
+                    {% for error in form.invoice_to.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        <br>
+                    {% endfor%}
+                </div>
+            {% else %}
+                {{ form.invoice_to(class="form-control form-control-md  border-success") }}
+            {% endif %}
+        </div>
+        <div class="form-group col-md-5">
+            <label class='mt-3'><h4>{{ form.invoice_no.label }}</h4></label>
+            {% if form.invoice_no.errors %}
+                {{ form.invoice_no(class="form-control form-control-md border-danger") }}
+                <div>
+                    {% for error in form.invoice_no.errors %}
+                        <span class='text-danger'>{{ error }}</span>
+                        <br>
+                    {% endfor%}
+                </div>
+            {% else %}
+                {{ form.invoice_no(class="form-control form-control-md  border-success") }}
+            {% endif %}
+        </div>
+    </div>
+
+        <div class='row'>
+            <div class="form-group col-md-3">
+                <label class='mt-3'><h4>{{ form.date_issued_quotation.label }}</h4></label>
+                {% if form.date_issued_quotation.errors %}
+                    {{ form.date_issued_quotation(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.date_issued_quotation.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.date_issued_quotation(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-3">
+                <label class='mt-3'><h4>{{ form.date_issued_delivery.label }}</h4></label>
+                {% if form.date_issued_delivery.errors %}
+                    {{ form.date_issued_delivery(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.date_issued_delivery.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.date_issued_delivery(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-3">
+                <label class='mt-3'><h4>{{ form.date_issued.label }}</h4></label>
+                {% if form.date_issued.errors %}
+                    {{ form.date_issued(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.date_issued.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.date_issued(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-3">
+                <label class='mt-3'><h4>{{ form.date_issued_receipt.label }}</h4></label>
+                {% if form.date_issued_receipt.errors %}
+                    {{ form.date_issued_receipt(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.date_issued_receipt.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.date_issued_receipt(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p1_name.label }}</h4></label>
+                {% if form.p1_name.errors %}
+                    {{ form.p1_name(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p1_name.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p1_name(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p1_quantity.label }}</h4></label>
+                {% if form.p1_quantity.errors %}
+                    {{ form.p1_quantity(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p1_quantity.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p1_quantity(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p1_unit_price.label }}</h4></label>
+                {% if form.p1_unit_price.errors %}
+                    {{ form.p1_unit_price(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p1_unit_price.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p1_unit_price(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+        </div>
+
+        
+        <div class='row' v-show='column >= 1'>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p2_name.label }}</h4></label>
+                {% if form.p2_name.errors %}
+                    {{ form.p2_name(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p2_name.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p2_name(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p2_quantity.label }}</h4></label>
+                {% if form.p2_quantity.errors %}
+                    {{ form.p2_quantity(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p2_quantity.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p2_quantity(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p2_unit_price.label }}</h4></label>
+                {% if form.p2_unit_price.errors %}
+                    {{ form.p2_unit_price(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p2_unit_price.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p2_unit_price(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class='row' v-show='column >= 2'>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p3_name.label }}</h4></label>
+                {% if form.p3_name.errors %}
+                    {{ form.p3_name(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p3_name.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p3_name(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p3_quantity.label }}</h4></label>
+                {% if form.p3_quantity.errors %}
+                    {{ form.p3_quantity(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p3_quantity.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p3_quantity(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p3_unit_price.label }}</h4></label>
+                {% if form.p3_unit_price.errors %}
+                    {{ form.p3_unit_price(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p3_unit_price.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p3_unit_price(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class='row' v-show='column >= 3'>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p4_name.label }}</h4></label>
+                {% if form.p4_name.errors %}
+                    {{ form.p4_name(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p4_name.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p4_name(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-4'><h4>{{ form.p4_quantity.label }}</h4></label>
+                {% if form.p4_quantity.errors %}
+                    {{ form.p4_quantity(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p4_quantity.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p4_quantity(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p4_unit_price.label }}</h4></label>
+                {% if form.p4_unit_price.errors %}
+                    {{ form.p4_unit_price(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p4_unit_price.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p4_unit_price(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class='row' v-show='column>= 4'>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p5_name.label }}</h4></label>
+                {% if form.p5_name.errors %}
+                    {{ form.p5_name(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p5_name.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p5_name(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p5_quantity.label }}</h4></label>
+                {% if form.p5_quantity.errors %}
+                    {{ form.p5_quantity(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p5_quantity.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p5_quantity(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p5_unit_price.label }}</h4></label>
+                {% if form.p5_unit_price.errors %}
+                    {{ form.p5_unit_price(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p5_unit_price.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p5_unit_price(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+        </div>
+        <div class='row' v-show='column>= 5'>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p6_name.label }}</h4></label>
+                {% if form.p6_name.errors %}
+                    {{ form.p6_name(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p6_name.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p6_name(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p6_quantity.label }}</h4></label>
+                {% if form.p6_quantity.errors %}
+                    {{ form.p6_quantity(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p6_quantity.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor%}
+                    </div>
+                {% else %}
+                    {{ form.p6_quantity(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+            <div class="form-group col-md-4">
+                <label class='mt-3'><h4>{{ form.p6_unit_price.label }}</h4></label>
+                {% if form.p6_unit_price.errors %}
+                    {{ form.p6_unit_price(class="form-control form-control-md border-danger") }}
+                    <div>
+                        {% for error in form.p6_unit_price.errors %}
+                            <span class='text-danger'>{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.p6_unit_price(class="form-control form-control-md  border-success") }}
+                {% endif %}
+            </div>
+        </div>
+        <a class="btn btn-md btn-success mt-2 mb-2"　@click='addColumn' v-if='column < 5'>明細欄を追加表示</a><br>
+        <div class='text-center'>
+            <a class="btn btn-danger px-5" href="{{ url_for(username +'.invoice_input') }}">
+                フォームの内容をすべてリセットする
+            </a>
+        </div>
+        <div class='h4 m-t3 text-center text-danger' v-if='column >= 5'>これ以上は追加できません．．．</div>
+
+        {{ form.submit(class="btn btn-lg btn-info btn-block mt-4 mb-5") }}
+</form>
+
+{% endblock content %}
+
+{% block data %}
+column: 0,
+{% endblock %}
+{% block methods %}
+addColumn:function(){
+    if(this.column <= 4){
+        this.column += 1;
+    }
+}
+{% endblock %}

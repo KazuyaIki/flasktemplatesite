@@ -1,0 +1,892 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <title>書類</title>
+      {% if not 'pdf' in url %}
+      <style>
+        
+        .sheet {
+          overflow: hidden;
+          position: relative;
+          box-sizing: border-box;
+          page-break-after: always;
+          box-shadow: 0mm 4mm 8mm 3mm rgba(0, 0, 0, 0.3); /* ドロップシャドウ */
+          /* 用紙サイズ A4 */
+        }
+      </style>
+      {% endif %}
+
+      {% if 'pdf' in url %}
+      <style>
+        
+        div.row_3 div.col_2 {
+          margin-left:120px;
+        }
+      </style>
+      {% endif %}
+
+    <style>
+      .link-pdf-wrapper{
+        text-align:center;
+        margin:20px;
+        padding:15px;
+      }
+      .link-pdf{
+        font-size:25px;
+        text-decoration: none;
+        width:100%;
+        background-color:rgb(0, 236, 51);
+        box-shadow: 1px 1px 3px green;
+        color:red;
+        padding:15px 25px;
+        border-radius:10px;
+        text-shadow: 1px 1px 2px rgb(240, 93, 93);
+      }
+          /* 印刷時の用紙設定 */
+          @page {
+            size: A4; /* 用紙サイズ */
+            margin: 0; /* ヘッダー・フッダーを無効化 */
+          }
+   
+          /* 要素の初期化 */
+          * {
+            /* マージン・パディングをリセットした方がデザインしやすい */
+            margin: 0;
+            padding: 0;
+            /* デフォルトのフォント */
+            color: #191970;
+            font-family: "游ゴシック Medium", "Yu Gothic Medium", "游ゴシック体", YuGothic,
+              sans-serif;
+            font-size: 12pt;
+            font-weight: normal;
+            /* 背景色・背景画像を印刷する（Chromeのみで有効） */
+            -webkit-print-color-adjust: exact;
+          }
+
+          /* リスト初期化 */
+          ul {
+            list-style: none;
+            padding-left: 3px;
+          }
+
+          /* ページレイアウト (section.sheet を１ページとする) */
+          .sheet {
+            /* 余白サイズ */
+            padding-top: 15mm;
+            padding-left: 15mm;
+            padding-right: 15mm;
+            height: 297mm;
+            width: 210mm;
+            page-break-after: always;
+          }
+       
+          /* プレビュー用のスタイル */
+          @media screen {
+            .sheet {
+              background: white; /* 背景を白く */
+              margin: auto;
+              margin-bottom: 0px;
+              padding-bottom: 0px;
+            }
+          }
+
+          /* 汎用クラス */
+          .text-left {
+            text-align: left;
+          }
+          .text-center {
+            text-align: center;
+          }
+          .text-right {
+            text-align: right;
+          }
+          .clear-element {
+            clear: both;
+          }
+
+          /* 大枠の指定 */
+          div.row_1 {
+            height: 18mm;
+          }
+          div.row_2 {
+            height: 16mm;
+          }
+
+          div.row_3 {
+            height: 55mm;
+          }
+          div.row_3 div.col_1 {
+            width: 90mm;
+            float: left;
+          }
+          div.row_3 div.col_2 {
+            position: relative;
+            z-index: 2;
+            padding-top: 10mm;
+            float: left;
+          }
+          div.row_4 {
+            height: 18mm;
+            margin-bottom:10px;
+          }
+          div.row_5 {
+            height: 120mm;
+          }
+          div.row_6 {
+            height: 18mm;
+          }
+
+          /* 個別のスタイル指定 */
+
+
+          /* タイトル */
+          h1 {
+            background: #3366cc;
+            font-size: 30px;
+            font-weight: normal;
+            letter-spacing: 30px;
+            color: #ffffff;
+          }
+
+          /* 顧客名・自社名 */
+          h2 {
+            font-size: 23px;
+            font-weight: normal;
+          }
+
+          /* 顧客名 */
+          h2.customer_name {
+            text-decoration: underline;
+          }
+
+          img.stamp{
+            position: absolute;
+            z-index: 10;
+            top: 7mm;
+            left: 68mm;
+            height: 17mm;
+            width: 17mm;
+          }
+
+          /* テーブル共通 */
+          table,
+          th,
+          td {
+            border: 1px #264d99 solid;
+            border-collapse: collapse;
+            padding: 4px 5px;
+          }
+
+          table th {
+            background: #3366cc;
+            font-weight: normal;
+            color: #ffffff;
+          }
+          table td {
+            text-align: right;
+          }
+
+          /* テーブル 総額欄 */
+          table.summary th {
+            font-size: 14pt;
+            width: 32mm;
+          }
+          table.summary td {
+            font-size: 14pt;
+            width: 40mm;
+
+          }
+
+          /* テーブル 明細欄 */
+          table.detail {
+            width: 100%;
+          }
+          table.detail tr {
+            height: 6mm;
+          }
+          table.detail th.item {
+            width: 58%;
+          }
+          table.detail th.unit_price {
+            width: 15%;
+          }
+          table.detail th.amount {
+            width: 12%;
+          }
+          table.detail th.subtotal {
+            width: 15%;
+          }
+
+          table.detail td.space {
+            border-left-style: hidden;
+            border-bottom-style: hidden;
+          }
+          table.detail tr.dataline:nth-child(odd) td {
+            background-color: #ccddff;
+          }
+          table.detail tr.dataline:nth-child(even) td {
+            background-color: #ffffff
+          }
+          .account{
+            margin-left:30px;
+            border: solid 1px black;
+            padding:15px;
+            width:60%;
+          }
+    </style>
+</head>
+
+<body> 
+  {% if not 'pdf' in url %}
+    <div class='link-pdf-wrapper'>
+      <a class="link-pdf" href="{{ url_for('applications.invoice_writer', timestamp=timestamp) }}">pdfファイルに変換する</a>
+    </div>
+  {% endif %}
+  
+  {% if session['quo'] %}
+    <section class="sheet" v-if='quotation'>
+        <div class="row_1">
+         
+          <h1 class="text-center">見　　積　　書</h1>
+        </div>
+        <div class="row_2">
+            <ul class="text-right">
+                <li># {{session['invoice_no']}}</li>
+                <li>{{session['date_issued_quotation']}}</li>
+            </ul>
+        </div>
+        <div class="row_3">
+            <div class="col_1">
+                <ul>
+                    <li>
+                        <h2 class="customer_name">{{session['invoice_to']}}</h2>
+                    </li>
+                </ul>
+            </div>
+            <div class="col_2">
+                <ul >
+                    <li>
+                        <h2>土佐硯一岐製作所 　壹岐一也</h2>
+                    </li>
+                    <li>〒787-0801</li>
+                    <li>高知県幡多郡三原村柚ノ木1027-1</li>
+                    <li>土佐硯加工製作所（共同作業）</li>
+                    <li>TEL: 080-7005-1505</li>
+                    <li>EMAIL: tosa_inkstone@yahoo.co.jp</li>
+                </ul>
+                {% if not 'pdf' in url %}
+                <img class="stamp" src="{{ url_for('static', filename='images/invoice/stamp_01.png') }}">
+                {% else %}
+                <img class="stamp" src="data:image/png;base64,{{ img_b64_str }}">
+                {% endif %}
+            </div>
+            <div class="clear-element"></div>
+        </div>
+
+        <div class="row_4">
+            <p>下記のとおりお見積り申し上げます。</p>
+
+            <table class="summary">
+                <tbody>
+                    <tr>
+                        <th>合計金額</th>
+                        <td>\. {{'{:,}'.format(session['total_price'])}}-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row_5">
+            <table class="detail">
+                <thead>
+                    <tr>
+                        <th class="item">品名</th>
+                        <th class="unit_price">単価</th>
+                        <th class="amount">数量</th>
+                        <th class="subtotal">金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="dataline">
+                        <td class="text-left">{{session['p1_name']}}</td>
+                        <td>{{'{:,}'.format(session['p1_unit_price'])}} </td>
+                        <td>{{session['p1_quantity']}}</td>
+                        <td>{{'{:,}'.format(session['p1_total_price'])}}</td>
+                    </tr>
+                    <tr class="dataline">
+                        <td class="text-left">{{session['p2_name'] if session['p2_name']}}</td>
+                        <td>{{'{:,}'.format(session['p2_unit_price']) if session['p2_unit_price']}} </td>
+                        <td>{{session['p2_quantity']  if session['p2_quantity']}}</td>
+                        <td>{{'{:,}'.format(session['p2_total_price']) if session['p2_total_price']}}</td>
+                    </tr>
+                    <tr class="dataline">
+                        <td class="text-left">{{session['p3_name'] if session['p3_name']}}</td>
+                        <td>{{'{:,}'.format(session['p3_unit_price']) if session['p3_unit_price']}} </td>
+                        <td>{{session['p3_quantity'] if session['p3_quantity']}}</td>
+                        <td>{{'{:,}'.format(session['p3_total_price']) if session['p3_total_price']}}</td>
+                    </tr>
+                    <tr class="dataline">
+                        <td class="text-left">{{session['p4_name'] if session['p4_name']}}</td>
+                        <td>{{'{:,}'.format(session['p4_unit_price']) if session['p4_unit_price']}} </td>
+                        <td>{{session['p4_quantity'] if session['p4_quantity']}}</td>
+                        <td>{{'{:,}'.format(session['p4_total_price']) if session['p4_total_price']}}</td>
+                    </tr>
+                    <tr class="dataline">
+                        <td class="text-left">{{session['p5_name'] if session['p5_name']}}</td>
+                        <td>{{'{:,}'.format(session['p5_unit_price']) if session['p5_unit_price']}} </td>
+                        <td>{{session['p5_quantity'] if session['p5_quantity']}}</td>
+                        <td>{{'{:,}'.format(session['p5_total_price']) if session['p5_total_price']}}</td>
+                    </tr>
+                    <tr class="dataline">
+                        <td class="text-left">{{session['p6_name'] if session['p6_name']}}</td>
+                        <td>{{'{:,}'.format(session['p6_unit_price']) if session['p6_unit_price']}} </td>
+                        <td>{{session['p6_quantity'] if session['p6_quantity']}}</td>
+                        <td>{{'{:,}'.format(session['p6_total_price']) if session['p6_total_price']}}</td>
+                    </tr>
+                    <tr class="dataline">
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                    </tr>
+                    <tr class="dataline">
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                    </tr>
+                    <tr class="dataline">
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                    </tr>
+                    <tr class="dataline">
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                    </tr>
+                    <tr class="dataline">
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                    </tr>
+                    <tr class="dataline">
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                    </tr>
+                    <tr>
+                        <td class="space" rowspan="3" colspan="2"> </td>
+                        <th> 小計 </th>
+                        <td> {{'{:,}'.format(session['total_price'])}} </td>
+                    </tr>
+                    <tr>
+                        <th> 消費税 </th>
+                        <td> 上記に含む </td>
+                    </tr>
+                    <tr>
+                        <th> 合計 </th>
+                        <td> {{'{:,}'.format(session['total_price'])}} </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <ul class='account'>
+            <li>取り扱い金融機関（振込先）</li>
+            <li>　名義：　壹岐　一也　/ ｲｷ ｶｽﾞﾔ</li>
+            <li>　ゆうちょ銀行　 記号： 12130　　番号： 30027771</li>
+            <p>　※他の金融機関からお手続きをされる場合</p>
+            <li>　　ゆうちょ銀行　店名： 二一八　　店番： 218</li>
+            <li>　　預金種目： 普通預金　　口座番号： 3002777</li>
+        </ul>
+    </section>
+{% endif %}
+
+{% if session['deli'] %}
+    <section class="sheet">
+      <div class="row_1">
+       
+        <h1 class="text-center">納　　品　　書</h1>
+      </div>
+      <div class="row_2">
+          <ul class="text-right">
+              <li>{{session['invoice_no']}}</li>
+              <li>{{session['date_issued_delivery']}}</li>
+          </ul>
+      </div>
+      <div class="row_3">
+          <div class="col_1">
+              <ul>
+                  <li>
+                      <h2 class="customer_name">{{session['invoice_to']}}</h2>
+                  </li>
+              </ul>
+          </div>
+          <div class="col_2">
+              <ul >
+                  <li>
+                      <h2>土佐硯一岐製作所 　壹岐一也</h2>
+                  </li>
+                  <li>〒787-0801</li>
+                  <li>高知県幡多郡三原村柚ノ木1027-1</li>
+                  <li>土佐硯加工製作所（共同作業）</li>
+                  <li>TEL: 080-7005-1505</li>
+                  <li>EMAIL: tosa_inkstone@yahoo.co.jp</li>
+              </ul>
+              {% if not 'pdf' in url %}
+              <img class="stamp" src="{{ url_for('static', filename='images/invoice/stamp_01.png') }}">
+              {% else %}
+              <img class="stamp" src="data:image/png;base64,{{ img_b64_str }}">
+              {% endif %}
+          </div>
+          <div class="clear-element"></div>
+      </div>
+
+      <div class="row_4">
+          <p>下記のとおり納品いたします。</p>
+
+          <table class="summary">
+              <tbody>
+                  <tr>
+                      <th>合計金額</th>
+                      <td>\. {{'{:,}'.format(session['total_price'])}}-</td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+
+      <div class="row_5">
+          <table class="detail">
+              <thead>
+                  <tr>
+                      <th class="item">品名</th>
+                      <th class="unit_price">単価</th>
+                      <th class="amount">数量</th>
+                      <th class="subtotal">金額</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr class="dataline">
+                      <td class="text-left">{{session['p1_name']}}</td>
+                      <td>{{'{:,}'.format(session['p1_unit_price'])}} </td>
+                      <td>{{session['p1_quantity']}}</td>
+                      <td>{{'{:,}'.format(session['p1_total_price'])}}</td>
+                  </tr>
+                  <tr class="dataline">
+                      <td class="text-left">{{session['p2_name'] if session['p2_name']}}</td>
+                      <td>{{'{:,}'.format(session['p2_unit_price']) if session['p2_unit_price']}} </td>
+                      <td>{{session['p2_quantity']  if session['p2_quantity']}}</td>
+                      <td>{{'{:,}'.format(session['p2_total_price']) if session['p2_total_price']}}</td>
+                  </tr>
+                  <tr class="dataline">
+                      <td class="text-left">{{session['p3_name'] if session['p3_name']}}</td>
+                      <td>{{'{:,}'.format(session['p3_unit_price']) if session['p3_unit_price']}} </td>
+                      <td>{{session['p3_quantity'] if session['p3_quantity']}}</td>
+                      <td>{{'{:,}'.format(session['p3_total_price']) if session['p3_total_price']}}</td>
+                  </tr>
+                  <tr class="dataline">
+                      <td class="text-left">{{session['p4_name'] if session['p4_name']}}</td>
+                      <td>{{'{:,}'.format(session['p4_unit_price']) if session['p4_unit_price']}} </td>
+                      <td>{{session['p4_quantity'] if session['p4_quantity']}}</td>
+                      <td>{{'{:,}'.format(session['p4_total_price']) if session['p4_total_price']}}</td>
+                  </tr>
+                  <tr class="dataline">
+                      <td class="text-left">{{session['p5_name'] if session['p5_name']}}</td>
+                      <td>{{'{:,}'.format(session['p5_unit_price']) if session['p5_unit_price']}} </td>
+                      <td>{{session['p5_quantity'] if session['p5_quantity']}}</td>
+                      <td>{{'{:,}'.format(session['p5_total_price']) if session['p5_total_price']}}</td>
+                  </tr>
+                  <tr class="dataline">
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                  </tr>
+                  <tr class="dataline">
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                  </tr>
+                  <tr class="dataline">
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                  </tr>
+                  <tr class="dataline">
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                  </tr>
+                  <tr class="dataline">
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                  </tr>
+                  <tr class="dataline">
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                      <td> </td>
+                  </tr>
+                  <tr>
+                      <td class="space" rowspan="3" colspan="2"> </td>
+                      <th> 小計 </th>
+                      <td> {{'{:,}'.format(session['total_price'])}} </td>
+                  </tr>
+                  <tr>
+                      <th> 消費税 </th>
+                      <td> 上記に含む </td>
+                  </tr>
+                  <tr>
+                      <th> 合計 </th>
+                      <td> {{'{:,}'.format(session['total_price'])}} </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+
+      <ul class='account'>
+          <li>取り扱い金融機関（振込先）</li>
+          <li>　名義：　壹岐　一也　/ ｲｷ ｶｽﾞﾔ</li>
+          <li>　ゆうちょ銀行　 記号： 12130　　番号： 30027771</li>
+          <p>　※他の金融機関からお手続きをされる場合</p>
+          <li>　　ゆうちょ銀行　店名： 二一八　　店番： 218</li>
+          <li>　　預金種目： 普通預金　　口座番号： 3002777</li>
+      </ul>
+  </section>
+{% endif %}
+
+{% if session['inv'] %}
+  <section class="sheet">
+    <div class="row_1">
+     
+      <h1 class="text-center">請　　求　　書</h1>
+    </div>
+    <div class="row_2">
+        <ul class="text-right">
+            <li>{{session['invoice_no']}}</li>
+            <li>{{session['date_issued']}}</li>
+        </ul>
+    </div>
+    <div class="row_3">
+        <div class="col_1">
+            <ul>
+                <li>
+                    <h2 class="customer_name">{{session['invoice_to']}}</h2>
+                </li>
+            </ul>
+        </div>
+        <div class="col_2">
+            <ul >
+                <li>
+                    <h2>土佐硯一岐製作所 　壹岐一也</h2>
+                </li>
+                <li>〒787-0801</li>
+                <li>高知県幡多郡三原村柚ノ木1027-1</li>
+                <li>土佐硯加工製作所（共同作業）</li>
+                <li>TEL: 080-7005-1505</li>
+                <li>EMAIL: tosa_inkstone@yahoo.co.jp</li>
+            </ul>
+            {% if not 'pdf' in url %}
+            <img class="stamp" src="{{ url_for('static', filename='images/invoice/stamp_01.png') }}">
+            {% else %}
+            <img class="stamp" src="data:image/png;base64,{{ img_b64_str }}">
+            {% endif %}
+        </div>
+        <div class="clear-element"></div>
+    </div>
+
+    <div class="row_4">
+        <p>下記のとおりご請求申し上げます。</p>
+
+        <table class="summary">
+            <tbody>
+                <tr>
+                    <th>合計金額</th>
+                    <td>\. {{'{:,}'.format(session['total_price'])}}-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row_5">
+        <table class="detail">
+            <thead>
+                <tr>
+                    <th class="item">品名</th>
+                    <th class="unit_price">単価</th>
+                    <th class="amount">数量</th>
+                    <th class="subtotal">金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="dataline">
+                    <td class="text-left">{{session['p1_name']}}</td>
+                    <td>{{'{:,}'.format(session['p1_unit_price'])}} </td>
+                    <td>{{session['p1_quantity']}}</td>
+                    <td>{{'{:,}'.format(session['p1_total_price'])}}</td>
+                </tr>
+                <tr class="dataline">
+                    <td class="text-left">{{session['p2_name'] if session['p2_name']}}</td>
+                    <td>{{'{:,}'.format(session['p2_unit_price']) if session['p2_unit_price']}} </td>
+                    <td>{{session['p2_quantity']  if session['p2_quantity']}}</td>
+                    <td>{{'{:,}'.format(session['p2_total_price']) if session['p2_total_price']}}</td>
+                </tr>
+                <tr class="dataline">
+                    <td class="text-left">{{session['p3_name'] if session['p3_name']}}</td>
+                    <td>{{'{:,}'.format(session['p3_unit_price']) if session['p3_unit_price']}} </td>
+                    <td>{{session['p3_quantity'] if session['p3_quantity']}}</td>
+                    <td>{{'{:,}'.format(session['p3_total_price']) if session['p3_total_price']}}</td>
+                </tr>
+                <tr class="dataline">
+                    <td class="text-left">{{session['p4_name'] if session['p4_name']}}</td>
+                    <td>{{'{:,}'.format(session['p4_unit_price']) if session['p4_unit_price']}} </td>
+                    <td>{{session['p4_quantity'] if session['p4_quantity']}}</td>
+                    <td>{{'{:,}'.format(session['p4_total_price']) if session['p4_total_price']}}</td>
+                </tr>
+                <tr class="dataline">
+                    <td class="text-left">{{session['p5_name'] if session['p5_name']}}</td>
+                    <td>{{'{:,}'.format(session['p5_unit_price']) if session['p5_unit_price']}} </td>
+                    <td>{{session['p5_quantity'] if session['p5_quantity']}}</td>
+                    <td>{{'{:,}'.format(session['p5_total_price']) if session['p5_total_price']}}</td>
+                </tr>
+                <tr class="dataline">
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                </tr>
+                <tr class="dataline">
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                </tr>
+                <tr class="dataline">
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                </tr>
+                <tr class="dataline">
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                </tr>
+                <tr class="dataline">
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                </tr>
+                <tr class="dataline">
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td class="space" rowspan="3" colspan="2"> </td>
+                    <th> 小計 </th>
+                    <td> {{'{:,}'.format(session['total_price'])}} </td>
+                </tr>
+                <tr>
+                    <th> 消費税 </th>
+                    <td> 上記に含む </td>
+                </tr>
+                <tr>
+                    <th> 合計 </th>
+                    <td> {{'{:,}'.format(session['total_price'])}} </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ul class='account'>
+        <li>取り扱い金融機関（振込先）</li>
+        <li>　名義：　壹岐　一也　/ ｲｷ ｶｽﾞﾔ</li>
+        <li>　ゆうちょ銀行　 記号： 12130　　番号： 30027771</li>
+        <p>　※他の金融機関からお手続きをされる場合</p>
+        <li>　　ゆうちょ銀行　店名： 二一八　　店番： 218</li>
+        <li>　　預金種目： 普通預金　　口座番号： 3002777</li>
+    </ul>
+</section>
+{% endif %}
+
+{% if session['rec'] %}
+<section class="sheet">
+  <div class="row_1">
+
+    <h1 class="text-center">領　　収　　書</h1>
+  </div>
+  <div class="row_2">
+      <ul class="text-right">
+          <li>{{session['invoice_no']}}</li>
+          <li>{{session['date_issued_receipt']}}</li>
+      </ul>
+  </div>
+  <div class="row_3">
+      <div class="col_1">
+          <ul>
+              <li>
+                  <h2 class="customer_name">{{session['invoice_to']}}</h2>
+              </li>
+          </ul>
+      </div>
+      <div class="col_2">
+          <ul >
+              <li>
+                  <h2>土佐硯一岐製作所 　壹岐一也</h2>
+              </li>
+              <li>〒787-0801</li>
+              <li>高知県幡多郡三原村柚ノ木1027-1</li>
+              <li>土佐硯加工製作所（共同作業）</li>
+              <li>TEL: 080-7005-1505</li>
+              <li>EMAIL: tosa_inkstone@yahoo.co.jp</li>
+          </ul>
+          {% if not 'pdf' in url %}
+          <img class="stamp" src="{{ url_for('static', filename='images/invoice/stamp_01.png') }}">
+          {% else %}
+          <img class="stamp" src="data:image/png;base64,{{ img_b64_str }}">
+          {% endif %}
+      </div>
+      <div class="clear-element"></div>
+  </div>
+
+  <div class="row_4">
+      <p>下記のとおり領収いたしました。</p>
+
+      <table class="summary">
+          <tbody>
+              <tr>
+                  <th>合計金額</th>
+                  <td>\. {{'{:,}'.format(session['total_price'])}}-</td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+
+  <div class="row_5">
+      <table class="detail">
+          <thead>
+              <tr>
+                  <th class="item">品名</th>
+                  <th class="unit_price">単価</th>
+                  <th class="amount">数量</th>
+                  <th class="subtotal">金額</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr class="dataline">
+                  <td class="text-left">{{session['p1_name']}}</td>
+                  <td>{{'{:,}'.format(session['p1_unit_price'])}} </td>
+                  <td>{{session['p1_quantity']}}</td>
+                  <td>{{'{:,}'.format(session['p1_total_price'])}}</td>
+              </tr>
+              <tr class="dataline">
+                  <td class="text-left">{{session['p2_name'] if session['p2_name']}}</td>
+                  <td>{{'{:,}'.format(session['p2_unit_price']) if session['p2_unit_price']}} </td>
+                  <td>{{session['p2_quantity']  if session['p2_quantity']}}</td>
+                  <td>{{'{:,}'.format(session['p2_total_price']) if session['p2_total_price']}}</td>
+              </tr>
+              <tr class="dataline">
+                  <td class="text-left">{{session['p3_name'] if session['p3_name']}}</td>
+                  <td>{{'{:,}'.format(session['p3_unit_price']) if session['p3_unit_price']}} </td>
+                  <td>{{session['p3_quantity'] if session['p3_quantity']}}</td>
+                  <td>{{'{:,}'.format(session['p3_total_price']) if session['p3_total_price']}}</td>
+              </tr>
+              <tr class="dataline">
+                  <td class="text-left">{{session['p4_name'] if session['p4_name']}}</td>
+                  <td>{{'{:,}'.format(session['p4_unit_price']) if session['p4_unit_price']}} </td>
+                  <td>{{session['p4_quantity'] if session['p4_quantity']}}</td>
+                  <td>{{'{:,}'.format(session['p4_total_price']) if session['p4_total_price']}}</td>
+              </tr>
+              <tr class="dataline">
+                  <td class="text-left">{{session['p5_name'] if session['p5_name']}}</td>
+                  <td>{{'{:,}'.format(session['p5_unit_price']) if session['p5_unit_price']}} </td>
+                  <td>{{session['p5_quantity'] if session['p5_quantity']}}</td>
+                  <td>{{'{:,}'.format(session['p5_total_price']) if session['p5_total_price']}}</td>
+              </tr>
+              <tr class="dataline">
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+              </tr>
+              <tr class="dataline">
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+              </tr>
+              <tr class="dataline">
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+              </tr>
+              <tr class="dataline">
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+              </tr>
+              <tr class="dataline">
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+              </tr>
+              <tr class="dataline">
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+              </tr>
+              <tr>
+                  <td class="space" rowspan="3" colspan="2"> </td>
+                  <th> 小計 </th>
+                  <td> {{'{:,}'.format(session['total_price'])}} </td>
+              </tr>
+              <tr>
+                  <th> 消費税 </th>
+                  <td> 上記に含む </td>
+              </tr>
+              <tr>
+                  <th> 合計 </th>
+                  <td> {{'{:,}'.format(session['total_price'])}} </td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+
+  <ul class='account'>
+      <li>取り扱い金融機関（振込先）</li>
+      <li>　名義：　壹岐　一也　/ ｲｷ ｶｽﾞﾔ</li>
+      <li>　ゆうちょ銀行　 記号： 12130　　番号： 30027771</li>
+      <p>　※他の金融機関からお手続きをされる場合</p>
+      <li>　　ゆうちょ銀行　店名： 二一八　　店番： 218</li>
+      <li>　　預金種目： 普通預金　　口座番号： 3002777</li>
+  </ul>
+</section>
+{% endif %}
+
+</body>
+
+</html>
